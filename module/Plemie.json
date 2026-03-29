@@ -1,10 +1,10 @@
 [
   {
     "page": "screen=info_ally",
-    "label": "<i class='bi bi-graph-up' style='color:#4b250a; font-size:16px;'></i>",
+    "label": "🎯",
     "url": "https://twdatabase.online/Data/Tribe/{id}",
-    "position": "table.vis th:contains('Właściwości')",
+    "position": "table.vis tr th:first-child",
     "method": "append",
-    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 15px; cursor: pointer; display: inline-block; vertical-align: middle; text-decoration: none !important;"
+    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 5px; cursor: pointer; display: inline-block; vertical-align: middle; font-size: 14px; text-decoration: none !important;"
   }
 ]
