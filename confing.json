@@ -3,6 +3,7 @@
     {
       "type": "topMenu",
       "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/top_menu.json"
+    },
     {
       "type": "contextButtons",
       "name": "Gracz",
