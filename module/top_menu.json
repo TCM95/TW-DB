@@ -1,21 +1,21 @@
 {
   "trigger": {
-    "label": "<i class='bi bi-database-fill' style='color:white; font-size:16px; margin-right:8px;'></i><span style='color:white; font-weight:700; font-size:14px; font-family:sans-serif; letter-spacing:-0.5px;'>TWDatabase</span>",
-    "style": "display:inline-flex; align-items:center; cursor:pointer; background:#212529 !important; padding:5px 12px; border-radius:3px; border:1px solid #343a40; margin-right:10px; vertical-align:middle; user-select:none; text-decoration:none;"
+    "label": "<i class='bi bi-database-fill' style='color:white; font-size:12px; margin-right:5px;'></i><span style='color:white; font-weight:700; font-size:11px; font-family:sans-serif; letter-spacing:-0.3px;'>TWDatabase</span>",
+    "style": "position:absolute; left:0; top:-25px; display:inline-flex; align-items:center; cursor:pointer; background:#212529 !important; padding:3px 8px; border-radius:3px; border:1px solid #343a40; user-select:none; text-decoration:none; white-space:nowrap; z-index:10001;"
   },
-  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 160px; font-family: sans-serif;",
-  "itemStyle": "display: flex; align-items: center; padding: 10px 15px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 13px; font-weight: 500; border-bottom: 1px solid #343a40;",
+  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 3px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 150px; font-family: sans-serif;",
+  "itemStyle": "display: flex; align-items: center; padding: 8px 12px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 12px; font-weight: 500; border-bottom: 1px solid #343a40;",
   "items": [
     { 
-      "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", 
+      "label": "<i class='bi bi-fire' style='margin-right: 10px; color: #ff4500;'></i> Rozpiski", 
       "url": "https://twdatabase.online/AttackPlanner/Show" 
     },
     { 
-      "label": "<i class='bi bi-shield-shaded' style='margin-right: 12px; color: #00bfff;'></i> Obstawy", 
+      "label": "<i class='bi bi-shield-shaded' style='margin-right: 10px; color: #00bfff;'></i> Obstawy", 
       "url": "https://twdatabase.online/Guards" 
     },
     { 
-      "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 12px; color: #32cd32;'></i> Mapa", 
+      "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 10px; color: #32cd32;'></i> Mapa", 
       "url": "https://twdatabase.online/Map" 
     }
   ]
