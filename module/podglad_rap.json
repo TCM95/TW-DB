@@ -1,1 +1,11 @@
+[
+  {
+    "page": "screen=report",
+    "label": "<span class='icon header report' style='margin-right: 5px;'></span> TW-DB Raporty",
+    "url": "https://twdatabase.online/Data/Reports",
+    "position": "table.modemenu tbody",
+    "method": "prepend",
+    "style": "display: block; padding: 5px; border: 1px solid #7d510f; background-color: #f4e4bc; font-weight: bold; text-decoration: none !important; color: #4b250a !important; margin-bottom: 2px; text-align: center; cursor: pointer;"
+  }
+]
 po
