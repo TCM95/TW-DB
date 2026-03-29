@@ -47,18 +47,25 @@
   },
   {
     "page": "screen=info_player",
-    "label": "DANE GRACZA (TW DB)",
-    "url": "https://twdatabase.online/Data/Players"
+    "label": "PROFIL GRACZA (TW DB)",
+    "url": "https://twdatabase.online/Data/Player/{id}"
   },
   {
     "page": "screen=info_ally",
-    "label": "DANE PLEMIENIA (TW DB)",
-    "url": "https://twdatabase.online/Data/Tribes"
+    "label": "STATYSTYKI PLEMIENIA (TW DB)",
+    "url": "https://twdatabase.online/Data/Tribe/{id}"
   },
   {
     "page": "screen=overview",
     "exclude": "mode",
     "label": "STRONA GŁÓWNA (TW DB)",
     "url": "https://twdatabase.online/"
+  },
+    {
+    "page": "screen=info_village",
+    "label": "HISTORIA WIOSKI (TW DB)",
+    "url": "https://twdatabase.online/Data/Village/{id}"
+  }
+]
   }
 ]
