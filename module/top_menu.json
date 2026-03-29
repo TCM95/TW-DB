@@ -1,19 +1,19 @@
 {
-  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 140px; font-family: sans-serif; overflow: hidden; z-index: 100002;",
-  "itemStyle": "display: flex; align-items: center; padding: 8px 12px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 12px; font-weight: 500; border-bottom: 1px solid #343a40;",
-  "style": "position:absolute; left:2px; top:2px; display:inline-flex; align-items:center; cursor:pointer; background:#212529 !important; padding:4px 8px; border-radius:3px; border:1px solid #343a40; text-decoration:none !important; white-space:nowrap; vertical-align:middle; line-height:1; z-index: 100001; margin-top:2px !important;",
-  "label": "<i class='bi bi-database-fill' style='color:white; font-size:13px; margin-right:4px; display:inline-block; vertical-align:middle;'></i><span style='color:white; font-weight:700; font-size:11px; font-family:sans-serif; text-transform:uppercase; letter-spacing:0.3px; display:inline-block; vertical-align:middle;'>TWDB</span>",
+  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 2px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 150px; font-family: sans-serif; z-index: 100002; line-height: 1.2;",
+  "itemStyle": "display: flex; align-items: center; padding: 10px 15px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 13px; font-weight: 500; border-bottom: 1px solid #343a40;",
+  "style": "position:absolute; left:8px; top:6px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; background:#212529 !important; padding:4px 6px; border-radius:3px; border:1px solid #343a40; text-decoration:none !important; white-space:nowrap; vertical-align:middle; line-height:1; z-index: 100001;",
+  "label": "<i class='bi bi-database-fill' style='color:white; font-size:14px; line-height: 1; display:block;'></i>",
   "items": [
     { 
-      "label": "<i class='bi bi-fire' style='margin-right: 10px; color: #ff4500;'></i> Rozpiski", 
+      "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", 
       "url": "https://twdatabase.online/AttackPlanner/Show" 
     },
     { 
-      "label": "<i class='bi bi-shield-shaded' style='margin-right: 10px; color: #00bfff;'></i> Obstawy", 
+      "label": "<i class='bi bi-shield-shaded' style='margin-right: 12px; color: #00bfff;'></i> Obstawy", 
       "url": "https://twdatabase.online/Guards" 
     },
     { 
-      "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 10px; color: #32cd32;'></i> Mapa", 
+      "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 12px; color: #32cd32;'></i> Mapa", 
       "url": "https://twdatabase.online/Map" 
     }
   ]
