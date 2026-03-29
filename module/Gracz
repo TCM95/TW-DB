@@ -1,1 +1,11 @@
+[
+  {
+    "page": "screen=info_player",
+    "label": "📊 Statystyki Gracza (TWDB)",
+    "url": "https://twdatabase.online/Data/Player/{id}",
+    "position": "#player_info",
+    "method": "append",
+    "style": "background: #603000; color: #fff; border: 1px solid #000; width: 100%; text-align: center; margin-top: 10px; display: block; padding: 8px; font-weight: bold; border-radius: 3px;"
+  }
+]
 
