@@ -1,71 +1,69 @@
 [
   {
+    "page": "screen=overview",
+    "exclude": "mode",
+    "label": "Strona główna",
+    "url": "https://twdatabase.online/"
+  },
+  {
     "page": "screen=mail&public_ids",
-    "label": "IMPORT Raporty (TW DB)",
+    "label": "Import raportów",
     "url": "https://twdatabase.online/Reports"
+  },
+  {
+    "page": "screen=reqdef",
+    "label": "Import ataków",
+    "url": "https://twdatabase.online/Attacks"
   },
   {
     "page": "screen=report",
     "exclude": "public_ids",
-    "label": "Przegląd Danych (TW DB)",
+    "label": "Raporty",
     "url": "https://twdatabase.online/Data/Reports"
   },
   {
-    "page": "screen=reqdef",
-    "label": "IMPORT Ataki (TW DB)",
-    "url": "https://twdatabase.online/Attacks"
-  },
-  {
-    "page": "mode=incomings",
-    "label": "SKLINUJ (TW DB)",
-    "url": "https://twdatabase.online/Wedges/My"
-  },
-  {
-    "page": "mode=incomings",
-    "label": "ROZPISKA KLINÓW",
-    "url": "https://twdatabase.online/Wedges/Assignments"
-  },
-  {
-    "page": "screen=memo",
-    "label": "ROZPISKI (TW DB)",
-    "url": "https://twdatabase.online/AttackPlanner/Show"
-  },
-  {
     "page": "screen=map",
-    "label": "MAPA (TW DB)",
+    "label": "Mapa",
     "url": "https://twdatabase.online/Map"
   },
   {
-    "page": "screen=ranking",
-    "label": "STATYSTYKI (TW DB)",
-    "url": "https://twdatabase.online/Statistics"
-  },
-  {
-    "page": "screen=ranking",
-    "label": "RANKINGI (TW DB)",
-    "url": "https://twdatabase.online/Ranking"
-  },
-  {
     "page": "screen=info_player",
-    "label": "PROFIL GRACZA (TW DB)",
+    "label": "Gracze",
     "url": "https://twdatabase.online/Data/Player/{id}"
   },
   {
     "page": "screen=info_ally",
-    "label": "STATYSTYKI PLEMIENIA (TW DB)",
+    "label": "Plemiona",
     "url": "https://twdatabase.online/Data/Tribe/{id}"
   },
   {
-    "page": "screen=overview",
-    "exclude": "mode",
-    "label": "STRONA GŁÓWNA (TW DB)",
-    "url": "https://twdatabase.online/"
-  },
-    {
     "page": "screen=info_village",
-    "label": "HISTORIA WIOSKI (TW DB)",
+    "label": "Wioski",
     "url": "https://twdatabase.online/Data/Village/{id}"
-  }
-]
+  },
+  {
+    "page": "mode=incomings",
+    "label": "Sklinuj",
+    "url": "https://twdatabase.online/Wedges/My"
+  },
+  {
+    "page": "mode=incomings",
+    "label": "Lista klinów",
+    "url": "https://twdatabase.online/Wedges"
+  },
+  {
+    "page": "mode=incomings",
+    "label": "Rozpiska klinów",
+    "url": "https://twdatabase.online/Wedges/Assignments"
+  },
+  {
+    "page": "screen=memo",
+    "label": "Rozpiski",
+    "url": "https://twdatabase.online/AttackPlanner/Show"
+  },
+  {
+    "page": "screen=overview_villages",
+    "label": "Obstawy",
+    "url": "https://twdatabase.online/Guards"
   }
 ]
