@@ -3,8 +3,8 @@
     "page": "screen=info_ally",
     "label": "🎯",
     "url": "https://twdatabase.online/Data/Tribe/{id}",
-    "position": "table.vis tr th:first-child",
+    "position": "table.vis:first-of-type th:first-child",
     "method": "append",
-    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 5px; cursor: pointer; display: inline-block; vertical-align: middle; font-size: 14px; text-decoration: none !important;"
+    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 10px; cursor: pointer; display: inline-block; vertical-align: middle; font-size: 14px; text-decoration: none !important;"
   }
 ]
