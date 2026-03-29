@@ -1,10 +1,10 @@
 [
   {
     "page": "screen=report",
-    "label": "🛡️ TW-DB",
-    "url": "https://twdatabase.online/Data/Reports",
-    "position": "table.modemenu tr:first-child td",
+    "label": "<tr><td style='min-width: 80px'><a href='https://twdatabase.online/Data/Reports' style='text-decoration: none !important; color: #4b250a !important; font-weight: bold;'><span class='icon header report'></span> TW-DB</a></td></tr>",
+    "url": "",
+    "position": "table.modemenu tbody",
     "method": "prepend",
-    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 5px; cursor: pointer; display: block; font-size: 13px; font-weight: bold; text-decoration: none !important; color: #4b250a !important;"
+    "style": ""
   }
 ]
