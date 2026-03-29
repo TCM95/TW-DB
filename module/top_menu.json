@@ -1,8 +1,8 @@
 {
-  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 2px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 160px; font-family: sans-serif; z-index: 100002;",
+  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 2px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 160px; font-family: sans-serif; z-index: 1000002 !important;",
   "itemStyle": "display: flex; align-items: center; padding: 10px 15px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 13px; font-weight: 500; border-bottom: 1px solid #343a40;",
-  "style": "display: inline-block !important; padding: 0 5px !important; cursor: pointer; text-decoration: none !important; vertical-align: middle !important; line-height: 1 !important;",
-  "label": "<span style='font-size:18px;'>⚙️</span>",
+  "style": "position: fixed !important; left: 5px !important; top: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; background: #212529 !important; border: 1px solid #343a40; border-radius: 4px; text-decoration: none !important; height: 26px !important; width: 32px !important; box-sizing: border-box !important; z-index: 1000001 !important;",
+  "label": "<i class='bi bi-list' style='color:white; font-size:20px; line-height:1; display:block;'></i>",
   "items": [
     { 
       "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", 
