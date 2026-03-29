@@ -1,10 +1,10 @@
 [
   {
     "page": "screen=info_player",
-    "label": "📊 Statystyki Gracza (TWDB)",
+    "label": "🎯",
     "url": "https://twdatabase.online/Data/Player/{id}",
-    "position": "#player_info",
+    "position": "#player_info th",
     "method": "append",
-    "style": "background: #603000; color: #fff; border: 1px solid #000; width: 100%; text-align: center; margin-top: 10px; display: block; padding: 8px; font-weight: bold; border-radius: 3px;"
+    "style": "margin-left: 10px; cursor: pointer; display: inline-block; vertical-align: middle; font-size: 16px; border: 1px solid #7d510f; border-radius: 3px; background-color: #f4e4bc; padding: 2px;"
   }
 ]
