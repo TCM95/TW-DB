@@ -1,10 +1,11 @@
 {
   "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 8px 0; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;",
-  "itemStyle": "display: block; padding: 8px 20px; color: rgba(255, 255, 255, 0.55) !important; text-decoration: none; font-size: 16px; font-weight: 400; transition: color 0.15s ease-in-out;",
-  "separatorStyle": "border-bottom: 1px solid #343a40; margin: 4px 0;",
+  "itemStyle": "display: flex; align-items: center; padding: 10px 20px; color: rgba(255, 255, 255, 0.75) !important; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.15s ease-in-out;",
+  "separatorStyle": "border-bottom: 1px solid #343a40; margin: 5px 0;",
   "items": [
-    { "label": "📝 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
-    { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
-    { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
+    { "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+    { "label": " <i class='bi bi-shield-shaded' style='margin-right: 12px; color: #00bfff;'></i> Obstawy", "url": "https://twdatabase.online/Guards" },
+    { "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 12px; color: #32cd32;'></i> Mapa", "url": "https://twdatabase.online/Map" },
+    { "label": "<i class='bi bi-person-badge-fill' style='margin-right: 12px; color: #ffd700;'></i> Statystyki TCM", "url": "https://twdatabase.online/Data/Player/TCM" }
   ]
 }
