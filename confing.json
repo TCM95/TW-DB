@@ -1,0 +1,64 @@
+[
+  {
+    "page": "screen=mail&public_ids",
+    "label": "IMPORT Raporty (TW DB)",
+    "url": "https://twdatabase.online/Reports"
+  },
+  {
+    "page": "screen=report",
+    "exclude": "public_ids",
+    "label": "Przegląd Danych (TW DB)",
+    "url": "https://twdatabase.online/Data/Reports"
+  },
+  {
+    "page": "screen=reqdef",
+    "label": "IMPORT Ataki (TW DB)",
+    "url": "https://twdatabase.online/Attacks"
+  },
+  {
+    "page": "mode=incomings",
+    "label": "SKLINUJ (TW DB)",
+    "url": "https://twdatabase.online/Wedges/My"
+  },
+  {
+    "page": "mode=incomings",
+    "label": "ROZPISKA KLINÓW",
+    "url": "https://twdatabase.online/Wedges/Assignments"
+  },
+  {
+    "page": "screen=memo",
+    "label": "ROZPISKI (TW DB)",
+    "url": "https://twdatabase.online/AttackPlanner/Show"
+  },
+  {
+    "page": "screen=map",
+    "label": "MAPA (TW DB)",
+    "url": "https://twdatabase.online/Map"
+  },
+  {
+    "page": "screen=ranking",
+    "label": "STATYSTYKI (TW DB)",
+    "url": "https://twdatabase.online/Statistics"
+  },
+  {
+    "page": "screen=ranking",
+    "label": "RANKINGI (TW DB)",
+    "url": "https://twdatabase.online/Ranking"
+  },
+  {
+    "page": "screen=info_player",
+    "label": "DANE GRACZA (TW DB)",
+    "url": "https://twdatabase.online/Data/Players"
+  },
+  {
+    "page": "screen=info_ally",
+    "label": "DANE PLEMIENIA (TW DB)",
+    "url": "https://twdatabase.online/Data/Tribes"
+  },
+  {
+    "page": "screen=overview",
+    "exclude": "mode",
+    "label": "STRONA GŁÓWNA (TW DB)",
+    "url": "https://twdatabase.online/"
+  }
+]
