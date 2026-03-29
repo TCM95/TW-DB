@@ -1,69 +1,78 @@
 [
   {
-    "page": "screen=overview",
-    "exclude": "mode",
-    "label": "Strona główna",
-    "url": "https://twdatabase.online/"
+    "position": "topMenu",
+    "label": "📄 Rozpiski",
+    "url": "https://twdatabase.online/AttackPlanner/Show"
+  },
+  {
+    "position": "topMenu",
+    "label": "🛡️ Obstawy",
+    "url": "https://twdatabase.online/Guards"
+  },
+  {
+    "position": "topMenu",
+    "label": "🗺️ Mapa",
+    "url": "https://twdatabase.online/Map"
   },
   {
     "page": "screen=mail&public_ids",
-    "label": "Import raportów",
+    "label": "Etykiety: Import raportów",
     "url": "https://twdatabase.online/Reports"
   },
   {
     "page": "screen=reqdef",
-    "label": "Import ataków",
+    "label": "Etykiety: Import ataków",
     "url": "https://twdatabase.online/Attacks"
   },
   {
     "page": "screen=report",
     "exclude": "public_ids",
-    "label": "Raporty",
+    "label": "Etykiety: Raporty",
     "url": "https://twdatabase.online/Data/Reports"
   },
   {
     "page": "screen=map",
-    "label": "Mapa",
+    "label": "Etykiety: Mapa",
     "url": "https://twdatabase.online/Map"
   },
   {
     "page": "screen=info_player",
-    "label": "Gracze",
+    "label": "Etykiety: Gracze",
     "url": "https://twdatabase.online/Data/Player/{id}"
   },
   {
     "page": "screen=info_ally",
-    "label": "Plemiona",
+    "label": "Etykiety: Plemiona",
     "url": "https://twdatabase.online/Data/Tribe/{id}"
   },
   {
     "page": "screen=info_village",
-    "label": "Wioski",
+    "label": "Etykiety: Wioski",
     "url": "https://twdatabase.online/Data/Village/{id}"
   },
   {
     "page": "mode=incomings",
-    "label": "Sklinuj",
+    "label": "Etykiety: Sklinuj",
     "url": "https://twdatabase.online/Wedges/My"
   },
   {
     "page": "mode=incomings",
-    "label": "Lista klinów",
+    "label": "Etykiety: Lista klinów",
     "url": "https://twdatabase.online/Wedges"
   },
   {
     "page": "mode=incomings",
-    "label": "Rozpiska klinów",
+    "label": "Etykiety: Rozpiska klinów",
     "url": "https://twdatabase.online/Wedges/Assignments"
   },
   {
     "page": "screen=memo",
-    "label": "Rozpiski",
+    "label": "Etykiety: Rozpiski",
     "url": "https://twdatabase.online/AttackPlanner/Show"
   },
   {
     "page": "screen=overview_villages",
-    "label": "Obstawy",
+    "label": "Etykiety: Obstawy",
     "url": "https://twdatabase.online/Guards"
   }
 ]
