@@ -1,0 +1,10 @@
+[
+  {
+    "page": "screen=ranking&mode=ally",
+    "label": "<i class='bi bi-graph-up' style='color:#4b250a; font-size:14px;'></i>",
+    "url": "https://twdatabase.online/Data/Tribe/{id}",
+    "position": "#ally_ranking_table tr td:nth-child(2)",
+    "method": "append",
+    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 8px; cursor: pointer; display: inline-block; vertical-align: middle; text-decoration: none !important;"
+  }
+]
