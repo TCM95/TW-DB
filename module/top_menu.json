@@ -1,111 +1,26 @@
-// ==UserScript==
-// @name         TW Database Modular Engine
-// @version      13.0
-// @author       TCM
-// @match        *://*.plemiona.pl/game.php?*
-// @grant        GM_xmlhttpRequest
-// @connect      raw.githubusercontent.com
-// ==/UserScript==
-
-(function() {
-    'use strict';
-    const MASTER_CONFIG = 'https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/confing.json';
-
-    const fetchJson = (url) => new Promise(res => GM_xmlhttpRequest({
-        method: "GET", url: url + "?t=" + new Date().getTime(),
-        headers: {"Cache-Control": "no-cache"},
-        onload: r => { try { res(JSON.parse(r.responseText)); } catch(e) { res(null); } },
-        onerror: () => res(null)
-    }));
-
-    const loadIcons = () => {
-        if (!document.querySelector('#tcm-icons')) {
-            const link = document.createElement('link');
-            link.id = 'tcm-icons';
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css';
-            document.head.appendChild(link);
-        }
-    };
-
-    async function init() {
-        loadIcons();
-        const master = await fetchJson(MASTER_CONFIG);
-        if (!master || !master.modules) return;
-
-        for (const mod of master.modules) {
-            const data = await fetchJson(mod.url);
-            if (!data) continue;
-            if (mod.type === 'topMenu') renderTopMenu(data);
-            if (mod.type === 'contextButtons') renderContextButtons(data);
-        }
+{
+  "trigger": {
+    "label": "<i class='bi bi-database-fill' style='color:white; font-size:14px; margin-right:8px;'></i><span style='color:white; font-weight:700; font-size:13px; font-family:sans-serif;'>TWDatabase</span>",
+    "style": "display:inline-flex; align-items:center; cursor:pointer; background:#212529 !important; padding:4px 12px; border-radius:3px; border:1px solid #343a40; margin-right:10px; vertical-align:middle; user-select:none; text-decoration:none;"
+  },
+  "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 180px; font-family: sans-serif;",
+  "itemStyle": "display: flex; align-items: center; padding: 10px 15px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 13px; font-weight: 500; border-bottom: 1px solid #343a40;",
+  "items": [
+    { 
+      "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", 
+      "url": "https://twdatabase.online/AttackPlanner/Show" 
+    },
+    { 
+      "label": "<i class='bi bi-shield-shaded' style='margin-right: 12px; color: #00bfff;'></i> Obstawy", 
+      "url": "https://twdatabase.online/Guards" 
+    },
+    { 
+      "label": "<i class='bi bi-geo-alt-fill' style='margin-right: 12px; color: #32cd32;'></i> Mapa", 
+      "url": "https://twdatabase.online/Map" 
+    },
+    { 
+      "label": "<i class='bi bi-search' style='margin-right: 12px; color: #ffd700;'></i> Szukaj gracza", 
+      "url": "https://twdatabase.online/Search/Player" 
     }
-
-    function renderTopMenu(config) {
-        const qb = document.querySelector('td#quickbar_contents');
-        if (!qb || !config.items) return;
-
-        qb.style.position = 'relative'; 
-        qb.style.paddingLeft = '145px'; // Zwiększyłem miejsce na napis
-
-        const iconWrap = document.createElement('div');
-        iconWrap.id = "tcm-target";
-        // STYL NAGŁÓWKA NA PASKU (cienki pasek z ikoną bazy)
-        iconWrap.style = "position:absolute; left:5px; top:4px; cursor:pointer; display:flex; align-items:center; background:#212529; padding:2px 8px; border-radius:3px; border:1px solid #343a40; z-index:10001;";
-        iconWrap.innerHTML = `<i class="bi bi-database-fill" style="color:white; font-size:14px; margin-right:6px;"></i><span style="color:white; font-weight:700; font-size:13px; font-family:sans-serif;">TWDatabase</span>`;
-
-        const list = document.createElement('ul');
-        list.style = "display:none; position:fixed; margin:0; list-style:none; z-index:99999; width:200px;";
-        if (config.containerStyle) list.style.cssText += config.containerStyle;
-
-        config.items.forEach((i, idx) => {
-            const li = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = i.url;
-            link.target = "_blank";
-            link.innerHTML = i.label;
-            if (config.itemStyle) link.style.cssText = config.itemStyle;
-            link.onmouseover = () => link.style.filter = "brightness(1.5)";
-            link.onmouseout = () => link.style.filter = "none";
-            if (idx !== config.items.length - 1 && config.separatorStyle) li.style.cssText += config.separatorStyle;
-            li.appendChild(link);
-            list.appendChild(li);
-        });
-
-        document.body.appendChild(list);
-        qb.appendChild(iconWrap);
-
-        const toggle = (e) => {
-            e.preventDefault(); e.stopPropagation();
-            if (list.style.display === 'block') { list.style.display = 'none'; } 
-            else {
-                const rect = iconWrap.getBoundingClientRect();
-                list.style.top = (rect.bottom + 2) + "px";
-                list.style.left = rect.left + "px";
-                list.style.display = 'block';
-            }
-        };
-
-        iconWrap.onclick = toggle;
-        document.addEventListener('click', () => list.style.display = 'none');
-    }
-
-    function renderContextButtons(items) {
-        const url = window.location.href;
-        const id = new URLSearchParams(window.location.search).get('id');
-        items.forEach(i => {
-            if (url.includes(i.page)) {
-                const target = document.querySelector(i.position);
-                if (target) {
-                    const btn = document.createElement('a');
-                    btn.href = i.url.replace('{id}', id || '');
-                    btn.innerHTML = i.label;
-                    btn.target = "_blank";
-                    if (i.style) btn.style.cssText = i.style;
-                    i.method === 'append' ? target.appendChild(btn) : target.prepend(btn);
-                }
-            }
-        });
-    }
-    init();
-})();
+  ]
+}
