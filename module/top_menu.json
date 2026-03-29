@@ -1,8 +1,8 @@
 {
   "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 2px 0; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5); width: 160px; font-family: sans-serif; z-index: 1000002 !important;",
   "itemStyle": "display: flex; align-items: center; padding: 10px 15px; color: rgba(255, 255, 255, 0.8) !important; text-decoration: none !important; font-size: 13px; font-weight: 500; border-bottom: 1px solid #343a40;",
-  "style": "position: fixed !important; left: 5px !important; top: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; background: #212529 !important; border: 1px solid #343a40; border-radius: 4px; text-decoration: none !important; height: 26px !important; width: 32px !important; box-sizing: border-box !important; z-index: 1000001 !important;",
-  "label": "<i class='bi bi-list' style='color:white; font-size:20px; line-height:1; display:block;'></i>",
+  "style": "display: none !important;",
+  "label": "<img src='/graphic/blank.png' onload='if(!window.tcm_injected){const r=document.getElementById(\"menu_row2\"); if(r){const td=document.createElement(\"td\"); td.className=\"box-item icon-box\"; td.innerHTML=\"<a href=\\\"#\\\" id=\\\"tcm-trigger\\\" style=\\\"display:block; padding:0 5px; text-decoration:none;\\\"><i class=\\\"bi bi-list\\\" style=\\\"color:#4b250a; font-size:18px;\\\"></i></a>\"; r.appendChild(td); window.tcm_injected=true; document.getElementById(\"tcm-trigger\").onclick=(e)=>{e.preventDefault(); e.stopPropagation(); const m=document.querySelector(\"ul[style*=\\\"z-index: 1000002\\\"]\"); const b=e.currentTarget.getBoundingClientRect(); m.style.top=(b.bottom+window.scrollY+2)+\"px\"; m.style.left=b.left+\"px\"; m.style.display=(m.style.display===\"block\"?\"none\":\"block\"); };}}'>",
   "items": [
     { 
       "label": "<i class='bi bi-fire' style='margin-right: 12px; color: #ff4500;'></i> Rozpiski", 
