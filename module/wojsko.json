@@ -1,1 +1,10 @@
-
+[
+  {
+    "page": "screen=overview_villages",
+    "label": "🎯 Importuj wojska",
+    "url": "javascript:(function(){var t=document.querySelector('table#units_table'); if(!t){t=document.querySelector('#units_table');} if(t){ try{var payload=btoa(unescape(encodeURIComponent(t.outerHTML))); var w=window.open('https://twdatabase.online/Wedges/My','_blank'); try{w.name='twd_troops:'+payload;}catch(e){} }catch(e){alert('Błąd kodowania');}} else alert('Nie znaleziono tabeli jednostek.');})();",
+    "position": "table#units_table",
+    "method": "append",
+    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 5px; cursor: pointer; display: inline-block; vertical-align: middle;"
+  }
+]
