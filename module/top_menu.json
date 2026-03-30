@@ -1,7 +1,7 @@
 [
   {
     "page": "game.php",
-    "label": "<td class='box-item icon-box nowrap' style='padding: 0 10px !important; border-left: 1px solid #343a40;'><span id='tcm-top-btn' style='cursor: pointer !important; font-size: 20px !important; vertical-align: middle !important; display: inline-block !important; position: relative !important; z-index: 10000 !important;'>🎯</span></td>",
+    "label": "<td class='box-item icon-box nowrap' style='padding: 0 8px !important; border-left: 1px solid #343a40;'><span id='tcm-top-btn' style='cursor: pointer !important; font-size: 20px !important; vertical-align: middle !important; display: inline-block !important; position: relative !important; z-index: 10000 !important;'>🎯</span></td>",
     "url": "",
     "position": "#menu_row2_village",
     "method": "after",
