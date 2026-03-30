@@ -1,22 +1,30 @@
 [
   {
     "type": "contextButtons",
-    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/Plemie.json"
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/Plemie.json"
   },
   {
     "type": "contextButtons",
-    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/podglad_rap.json"
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/podglad_rap.json"
   },
   {
-  "type": "topMenu",
-  "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/top_menu.json"
-  },
-  {
-    "type": "contextButtons",
-    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/wioska.json"
+    "type": "topMenu",
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/top_menu.json"
   },
   {
     "type": "contextButtons",
-    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/Gracz.json"
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/wioska.json"
+  },
+  {
+    "type": "contextButtons",
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/Gracz.json"
+  },
+  {
+    "type": "contextButtons",
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/atak.json"
+  },
+  {
+    "type": "contextButtons",
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/wojsko.json"
   }
 ]
