@@ -3,14 +3,14 @@
     "page": "*",
     "position": "#menu_row2",
     "method": "append",
-    "label": "<td class='box-item icon-box nowrap' style='padding: 0 5px !important; border-left: 1px solid #343a40;'><a id='tcm-top-btn' href='#' style='text-decoration: none !important; cursor: pointer !important; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;'><div style='width: 32px; height: 32px; background: linear-gradient(135deg, #495057 0%, #212529 100%); border: 2px solid #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.8);'><svg width='16' height='16' viewBox='0 0 512 512' fill='white' xmlns='http://www.w3.org/2000/svg' style='filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.5));'><path d='M0 112v48c0 53 114.6 96 256 96s256-43 256-96V112c0-53-114.6-96-256-96S0 59 0 112v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V224c0-53-114.6-96-256-96S0 171 0 224v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V336c0-53-114.6-96-256-96S0 283 0 336v48z'/></svg></div></a></td>",
-    "containerStyle": "display:none; position:absolute; z-index:999999; background: linear-gradient(135deg, #212529 0%, #343a40 100%); border: 1px solid #111; padding: 8px 0; min-width: 220px; box-shadow: 0 12px 35px rgba(0,0,0,0.7); border-radius: 15px;",
-    "itemStyle": "display:block; padding: 12px 20px; color: rgba(255,255,255,0.9) !important; text-decoration: none !important; font-size: 14px; font-family: 'Segoe UI', Tahoma, sans-serif; transition: all 0.2s ease; border-radius: 8px; margin: 2px 8px;",
+    "label": "<td class='box-item icon-box nowrap' style='padding: 0 4px !important; vertical-align: middle;'><a id='tcm-top-btn' href='#' style='text-decoration: none !important; cursor: pointer !important; display: flex; align-items: center; justify-content: center;'><div style='width: 28px; height: 28px; background: linear-gradient(135deg, #495057 0%, #212529 100%); border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);'><svg width='14' height='14' viewBox='0 0 512 512' fill='white' xmlns='http://www.w3.org/2000/svg' style='filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.5));'><path d='M0 112v48c0 53 114.6 96 256 96s256-43 256-96V112c0-53-114.6-96-256-96S0 59 0 112v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V224c0-53-114.6-96-256-96S0 171 0 224v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V336c0-53-114.6-96-256-96S0 283 0 336v48z'/></svg></div></a></td>",
+    "containerStyle": "display:none; position:absolute; z-index:999999; background: linear-gradient(135deg, #212529 0%, #343a40 100%); border: 1px solid #444; padding: 6px 0; min-width: 210px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 15px; overflow: hidden;",
+    "itemStyle": "display:block; padding: 12px 18px; color: #fff !important; text-decoration: none !important; font-size: 14px; font-family: 'Segoe UI', sans-serif; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;",
     "items": [
-      { "label": "<i class='fas fa-fire' style='margin-right: 8px; color: #fd7e14;'></i> 🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
-      { "label": "<i class='fas fa-shield-alt' style='margin-right: 8px; color: #198754;'></i> 🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
-      { "label": "<i class='fas fa-clock' style='margin-right: 8px; color: #0dcaf0;'></i> ⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
-      { "label": "<i class='fas fa-map' style='margin-right: 8px; color: #ffc107;'></i> 🗺️ Mapa", "url": "https://twdatabase.online/Map" }
+      { "label": "<i class='fas fa-fire' style='margin-right: 10px; color: #fd7e14;'></i> Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+      { "label": "<i class='fas fa-shield-alt' style='margin-right: 10px; color: #198754;'></i> Obstawy", "url": "https://twdatabase.online/Guards" },
+      { "label": "<i class='fas fa-clock' style='margin-right: 10px; color: #0dcaf0;'></i> Kliny", "url": "https://twdatabase.online/Wedges" },
+      { "label": "<i class='fas fa-map' style='margin-right: 10px; color: #ffc107;'></i> Mapa", "url": "https://twdatabase.online/Map" }
     ]
   }
 ]
