@@ -1,10 +1,10 @@
 [
   {
     "page": "screen",
-    "label": "<span id='tcm-top-btn' style='cursor: pointer; margin-left: 5px; font-size: 14px; vertical-align: middle; display: inline-block;'>🎯</span>",
+    "label": "<span id='tcm-top-btn' style='cursor: pointer; margin-left: 8px; font-size: 15px; vertical-align: middle; line-height: 1;'>🎯</span>",
     "url": "",
-    "position": "#menu_row2_village a.nowrap",
-    "method": "append",
+    "position": "#menu_row2_village span.nowrap:last",
+    "method": "after",
     "style": "",
     "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.6); width: 170px; z-index: 1000002 !important;",
     "itemStyle": "display: flex; align-items: center; padding: 12px 15px; color: #ffffff !important; text-decoration: none !important; font-size: 13px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
