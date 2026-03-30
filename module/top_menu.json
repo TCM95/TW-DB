@@ -1,12 +1,12 @@
 [
   {
     "page": "game.php",
-    "label": "<td class='box-item icon-box nowrap' style='padding: 0 8px !important; border-left: 1px solid #343a40;'><span id='tcm-top-btn' style='cursor: pointer !important; font-size: 20px !important; vertical-align: middle !important; display: inline-block !important; position: relative !important; z-index: 10000 !important;'>🎯</span></td>",
+    "label": "<td class='box-item icon-box nowrap' style='padding: 0 5px !important; border-left: 1px solid #343a40;'><a id='tcm-top-btn' href='#' title='Menu TCM' style='font-size: 20px !important; text-decoration: none !important; cursor: pointer !important; display: inline-block !important; vertical-align: middle !important;'>🎯</a></td>",
     "url": "",
-    "position": "#menu_row2_village",
-    "method": "after",
+    "position": "#menu_row2",
+    "method": "append",
     "style": "",
-    "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 25px rgba(0,0,0,0.8); width: 200px; z-index: 1000005 !important;",
+    "containerStyle": "background-color: #212529 !important; border: 1px solid #444; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 25px rgba(0,0,0,0.8); width: 200px; z-index: 1000005 !important;",
     "itemStyle": "display: flex; align-items: center; padding: 14px 18px; color: #ffffff !important; text-decoration: none !important; font-size: 15px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
     "items": [
       { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
