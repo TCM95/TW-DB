@@ -1,26 +1,13 @@
 {
   "type": "topMenu",
+  "target": "quickbar",
+
   "label": "🎯",
-  "style": "",
-  "containerStyle": "",
-  "itemStyle": "",
 
   "items": [
-    {
-      "label": "🔥 Rozpiski",
-      "url": "https://twdatabase.online/AttackPlanner/Show"
-    },
-    {
-      "label": "🛡️ Obstawy",
-      "url": "https://twdatabase.online/Guards"
-    },
-    {
-      "label": "⚔️ Kliny",
-      "url": "https://twdatabase.online/Wedges"
-    },
-    {
-      "label": "🗺️ Mapa",
-      "url": "https://twdatabase.online/Map"
-    }
+    { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+    { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
+    { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
+    { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
   ]
 }
