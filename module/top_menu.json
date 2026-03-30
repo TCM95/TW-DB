@@ -1,12 +1,12 @@
 [
   {
-    "page": "screen=",
+    "page": "screen",
     "label": "🎯 TW-DB",
     "url": "#",
-    "position": "#menu_row2_village",
-    "method": "after",
-    "style": "background: #f4e4bc !important; border: 1px solid #7d510f !important; padding: 2px 8px !important; margin: 0 5px; cursor: pointer; font-weight: bold; color: #4b250a !important; border-radius: 3px; display: inline-block; font-size: 12px; text-decoration: none !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);",
-    "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.6); width: 180px; z-index: 1000002 !important;",
+    "position": "#menu_row2",
+    "method": "append",
+    "style": "background: #f4e4bc !important; border: 1px solid #7d510f !important; padding: 2px 8px !important; margin-left: 5px; cursor: pointer; font-weight: bold; color: #4b250a !important; border-radius: 3px; display: inline-block; font-size: 11px; text-decoration: none !important; white-space: nowrap;",
+    "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.6); width: 170px; z-index: 1000002 !important;",
     "itemStyle": "display: flex; align-items: center; padding: 12px 15px; color: #ffffff !important; text-decoration: none !important; font-size: 13px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
     "items": [
       { 
@@ -18,12 +18,12 @@
         "url": "https://twdatabase.online/Guards" 
       },
       { 
-        "label": "🗺️ Mapa", 
-        "url": "https://twdatabase.online/Map" 
-      },
-      { 
         "label": "⚔️ Kliny", 
         "url": "https://twdatabase.online/Wedges" 
+      },
+      { 
+        "label": "🗺️ Mapa", 
+        "url": "https://twdatabase.online/Map" 
       }
     ]
   }
