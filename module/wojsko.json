@@ -1,49 +1,30 @@
 /* * Autor: Gal Anonim (TCM)
- * Nazwa: Etykiety_Wojsko_DualClick
+ * Nazwa: Etykiety_Wojsko_Clean
  */
 (function() {
-    [span_4](start_span)// Sprawdzenie czy jesteśmy na właściwej stronie[span_4](end_span)
-    if (window.location.href.indexOf('screen=overview_villages') === -1) {
-        return;
-    }
-
     const targetUrl = 'https://twdatabase.online/Wedges/My';
-    const table = document.querySelector('table#units_table'); 
+    [span_9](start_span)const table = document.querySelector('table#units_table'); //[span_9](end_span)
     
     if (!table) return;
 
-    [span_5](start_span)// Tworzenie przycisku w stylu gry[span_5](end_span)
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn';
-    btn.style.marginLeft = '10px';
-    btn.style.cursor = 'pointer';
-    btn.innerHTML = '<img src="https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp" style="vertical-align:middle; margin-right:5px;"> 1. Kopiuj Wojska';
+    btn.style.cssText = 'margin:10px; padding:5px 10px; cursor:pointer;';
+    btn.innerHTML = '1. Kopiuj Wojska';
     
-    let isCopied = false;
-
+    let step = 1;
     btn.onclick = function(e) {
         e.preventDefault();
-        if (!isCopied) {
-            try {
-                [span_6](start_span)// Kopiowanie całej tabeli[span_6](end_span)
-                localStorage.setItem('twd_import_data', table.outerHTML);
-                btn.innerHTML = '<img src="https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp" style="vertical-align:middle; margin-right:5px;"> 2. Przejdź do Klinów';
-                btn.style.backgroundColor = '#217312';
-                btn.style.color = 'white';
-                isCopied = true;
-            } catch (err) {
-                console.error('Błąd zapisu:', err);
-            }
+        if (step === 1) {
+            localStorage.setItem('twd_import_data', table.outerHTML);
+            btn.innerHTML = '2. Przejdź do Klinów';
+            btn.style.backgroundColor = '#217312';
+            btn.style.color = 'white';
+            step = 2;
         } else {
-            [span_7](start_span)// Przejście na stronę klinów[span_7](end_span)
             window.open(targetUrl, '_blank');
         }
     };
-
-    [span_8](start_span)// Wstawienie przycisku obok nagłówka "Wioska"[span_8](end_span)
-    const header = table.querySelector('th:first-child');
-    if (header) {
-        header.appendChild(btn);
-    }
+    table.parentNode.insertBefore(btn, table);
 })();
