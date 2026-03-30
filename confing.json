@@ -8,8 +8,8 @@
     "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/podglad_rap.json"
   },
   {
-    "type": "contextButtons",
-    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/top_menu.json"
+  "type": "topMenu",
+  "url": "https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/module/top_menu.json"
   },
   {
     "type": "contextButtons",
