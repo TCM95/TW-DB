@@ -1,10 +1,26 @@
-[
-  {
-    "page": "screen=overview_villages",
-    "label": "🎯 Importuj wojska",
-    "url": "javascript:(function(){var t=document.querySelector('table#units_table'); if(!t){t=document.querySelector('#units_table');} if(t){ try{var payload=btoa(unescape(encodeURIComponent(t.outerHTML))); var w=window.open('https://twdatabase.online/Wedges/My','_blank'); try{w.name='twd_troops:'+payload;}catch(e){} }catch(e){alert('Błąd kodowania');}} else alert('Nie znaleziono tabeli jednostek.');})();",
-    "position": "table#units_table",
-    "method": "append",
-    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 5px; cursor: pointer; display: inline-block; vertical-align: middle;"
-  }
-]
+/* * Autor: Gal Anonim (TCM)
+ * Nazwa: Etykiety_Wojsko_DualClick
+ */
+(function() {
+    const targetUrl = 'https://twdatabase.online/Wedges/My';
+    [span_14](start_span)const table = document.querySelector('table#units_table'); //[span_14](end_span)
+    if (!table) return;
+
+    const btn = document.createElement('button');
+    btn.innerHTML = '1. Kopiuj Wojska';
+    btn.className = 'btn';
+    btn.style.margin = '10px';
+    
+    let clicked = false;
+    btn.onclick = function(e) {
+        e.preventDefault();
+        if (!clicked) {
+            localStorage.setItem('twd_import_data', table.outerHTML);
+            btn.innerHTML = '2. Przejdź do Klinów';
+            clicked = true;
+        } else {
+            window.open(targetUrl, '_blank');
+        }
+    };
+    table.parentNode.insertBefore(btn, table);
+})();
