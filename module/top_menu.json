@@ -3,14 +3,14 @@
     "page": "*",
     "position": "#menu_row2",
     "method": "append",
-    "label": "<td class='box-item icon-box nowrap' style='padding: 0 5px !important; border-left: 1px solid #343a40;'><a id='tcm-top-btn' href='#' style='font-size: 20px !important; text-decoration: none !important; cursor: pointer !important;'>🎯</a></td>",
-    "containerStyle": "display:none;position:absolute;z-index:999999;background:#212529;border:1px solid #444;padding:5px 0;min-width:200px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); border-radius: 4px;",
-    "itemStyle": "display:block;padding:14px 18px;color:#ffffff !important;text-decoration:none !important;font-size:15px;border-bottom:1px solid #343a40;font-family:sans-serif;",
+    "label": "<td class='box-item icon-box nowrap' style='padding: 0 5px !important; border-left: 1px solid #343a40;'><a id='tcm-top-btn' href='#' style='text-decoration: none !important; cursor: pointer !important; display: flex; align-items: center; justify-content: center;'><svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' style='filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.5));'><path d='M20 12C20 13.6569 16.4183 15 12 15C7.58172 15 4 13.6569 4 12M20 12V18C20 19.6569 16.4183 21 12 21C7.58172 21 4 19.6569 4 18V12M20 12C20 10.3431 16.4183 9 12 9C7.58172 9 4 10.3431 4 12M20 6C20 7.65685 16.4183 9 12 9C7.58172 9 4 7.65685 4 6C4 4.34315 7.58172 3 12 3C16.4183 3 20 4.34315 20 6Z' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg></a></td>",
+    "containerStyle": "display:none; position:absolute; z-index:999999; background: linear-gradient(135deg, #212529 0%, #343a40 100%); border: none; padding: 8px 0; min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);",
+    "itemStyle": "display:block; padding: 12px 20px; color: rgba(255,255,255,0.8) !important; text-decoration: none !important; font-size: 14px; font-family: 'Segoe UI', Tahoma, sans-serif; transition: all 0.3s ease; border-radius: 8px; margin: 2px 8px;",
     "items": [
-      { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
-      { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
-      { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
-      { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
+      { "label": "<i class='fas fa-fire' style='margin-right: 8px; color: #fd7e14;'></i> 🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+      { "label": "<i class='fas fa-shield-alt' style='margin-right: 8px; color: #198754;'></i> 🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
+      { "label": "<i class='fas fa-clock' style='margin-right: 8px; color: #0dcaf0;'></i> ⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
+      { "label": "<i class='fas fa-map' style='margin-right: 8px; color: #ffc107;'></i> 🗺️ Mapa", "url": "https://twdatabase.online/Map" }
     ]
   }
 ]
