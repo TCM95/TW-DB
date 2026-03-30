@@ -1,16 +1,16 @@
 [
   {
     "page": "*",
-    "position": "#menu_row2",
+    "position": "#menu_row",
     "method": "append",
-    "label": "<td class='box-item icon-box nowrap' style='padding: 0 4px !important; vertical-align: middle;'><a id='tcm-top-btn' href='#' style='text-decoration: none !important; cursor: pointer !important; display: flex; align-items: center; justify-content: center;'><div style='width: 28px; height: 28px; background: linear-gradient(135deg, #495057 0%, #212529 100%); border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);'><svg width='14' height='14' viewBox='0 0 512 512' fill='white' xmlns='http://www.w3.org/2000/svg' style='filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.5));'><path d='M0 112v48c0 53 114.6 96 256 96s256-43 256-96V112c0-53-114.6-96-256-96S0 59 0 112v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V224c0-53-114.6-96-256-96S0 171 0 224v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V336c0-53-114.6-96-256-96S0 283 0 336v48z'/></svg></div></a></td>",
-    "containerStyle": "display:none; position:absolute; z-index:999999; background: linear-gradient(135deg, #212529 0%, #343a40 100%); border: 1px solid #444; padding: 6px 0; min-width: 210px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 15px; overflow: hidden;",
-    "itemStyle": "display:block; padding: 12px 18px; color: #fff !important; text-decoration: none !important; font-size: 14px; font-family: 'Segoe UI', sans-serif; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;",
+    "label": "<td class='box-item icon-box nowrap' style='padding: 0 8px !important; vertical-align: middle; border-left: 1px solid rgba(0,0,0,0.2);'><a id='tcm-top-btn' href='#' style='text-decoration: none !important; cursor: pointer !important; display: flex; align-items: center; justify-content: center;'><div style='width: 30px; height: 30px; background: linear-gradient(135deg, #495057 0%, #212529 100%); border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);'><svg width='16' height='16' viewBox='0 0 512 512' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M0 112v48c0 53 114.6 96 256 96s256-43 256-96V112c0-53-114.6-96-256-96S0 59 0 112v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V224c0-53-114.6-96-256-96S0 171 0 224v48zm0 112v48c0 53 114.6 96 256 96s256-43 256-96V336c0-53-114.6-96-256-96S0 283 0 336v48z'/></svg></div></a></td>",
+    "containerStyle": "display:none; position:absolute; z-index:999999; background: linear-gradient(135deg, #212529 0%, #343a40 100%); border: 1px solid #111; padding: 5px 0; min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden;",
+    "itemStyle": "display:block; padding: 14px 20px; color: #fff !important; text-decoration: none !important; font-size: 15px; font-family: 'Segoe UI', sans-serif; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;",
     "items": [
-      { "label": "<i class='fas fa-fire' style='margin-right: 10px; color: #fd7e14;'></i> Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
-      { "label": "<i class='fas fa-shield-alt' style='margin-right: 10px; color: #198754;'></i> Obstawy", "url": "https://twdatabase.online/Guards" },
-      { "label": "<i class='fas fa-clock' style='margin-right: 10px; color: #0dcaf0;'></i> Kliny", "url": "https://twdatabase.online/Wedges" },
-      { "label": "<i class='fas fa-map' style='margin-right: 10px; color: #ffc107;'></i> Mapa", "url": "https://twdatabase.online/Map" }
+      { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+      { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
+      { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
+      { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
     ]
   }
 ]
