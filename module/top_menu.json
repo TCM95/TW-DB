@@ -1,30 +1,18 @@
 [
   {
     "page": "screen",
-    "label": "<td class='box-item' style='padding: 0 5px;'><a href='#' id='tcm-top-btn' style='text-decoration: none; font-size: 16px; font-weight: bold;'>🎯</a></td>",
+    "label": "<a href='#' id='tcm-top-btn' style='margin-left: 8px; text-decoration: none !important; font-size: 16px; cursor: pointer;'>🎯</a>",
     "url": "",
-    "position": "#menu_row2_village",
+    "position": "#menu_row2_village a.nowrap",
     "method": "after",
-    "style": "",
+    "style": "display: inline-block !important; vertical-align: middle !important;",
     "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.6); width: 170px; z-index: 1000002 !important;",
     "itemStyle": "display: flex; align-items: center; padding: 12px 15px; color: #ffffff !important; text-decoration: none !important; font-size: 13px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
     "items": [
-      { 
-        "label": "🔥 Rozpiski", 
-        "url": "https://twdatabase.online/AttackPlanner/Show" 
-      },
-      { 
-        "label": "🛡️ Obstawy", 
-        "url": "https://twdatabase.online/Guards" 
-      },
-      { 
-        "label": "⚔️ Kliny", 
-        "url": "https://twdatabase.online/Wedges" 
-      },
-      { 
-        "label": "🗺️ Mapa", 
-        "url": "https://twdatabase.online/Map" 
-      }
+      { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
+      { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
+      { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
+      { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
     ]
   }
 ]
