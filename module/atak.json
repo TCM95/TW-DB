@@ -1,1 +1,10 @@
-
+[
+  {
+    "page": "screen=reqdef",
+    "label": "🎯 Importuj ataki",
+    "url": "javascript:(function(){var t=document.querySelector('#simple_message'); if(t){ try{var payload=btoa(unescape(encodeURIComponent(t.value||t.innerText||''))); var w=window.open('https://twdatabase.online/Attacks','_blank'); try{w.name='twd_attacks:'+payload;}catch(e){} }catch(e){alert('Błąd kodowania');}}else{ var table=document.querySelector('#incomings_table'); if(table){ try{var payload=btoa(unescape(encodeURIComponent(table.outerHTML))); var w=window.open('https://twdatabase.online/Attacks','_blank'); try{w.name='twd_attacks:'+payload;}catch(e){} }catch(e){alert('Błąd kodowania');}}else alert('Nie znaleziono pola z atakami.'); }})();",
+    "position": "#simple_message",
+    "method": "append",
+    "style": "background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-left: 5px; cursor: pointer; display: inline-block; vertical-align: middle;"
+  }
+]
