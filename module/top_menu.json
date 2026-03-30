@@ -1,8 +1,8 @@
 {
-  "label": "<i class='bi bi-gem' style='font-size:18px'></i>",
-  "style": "cursor: pointer; display:flex; align-items:center; gap:6px;",
-  "containerStyle": "background-color: #212529; border: 1px solid #444; border-radius: 6px; padding: 5px 0; width: 220px;",
-  "itemStyle": "display: flex; align-items:center; gap:8px; padding: 10px; color: white; text-decoration: none;",
+  "label": "🎯",
+  "style": "font-size: 20px; cursor: pointer;",
+  "containerStyle": "background-color: #212529; border: 1px solid #444; border-radius: 4px; padding: 5px 0; width: 200px;",
+  "itemStyle": "display: flex; padding: 10px; color: white; text-decoration: none;",
   "items": [
     { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
     { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
