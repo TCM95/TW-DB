@@ -1,13 +1,13 @@
 [
   {
     "page": "screen",
-    "label": "<span id='tcm-top-btn' style='cursor: pointer; margin-left: 10px; padding: 2px 5px; font-size: 16px; display: inline-block; vertical-align: middle;'>🎯</span>",
+    "label": "<span id='tcm-top-btn' style='cursor: pointer !important; margin-left: 8px !important; font-size: 18px !important; vertical-align: middle !important; display: inline-block !important; position: relative !important; z-index: 10000 !important; line-height: 1 !important;'>🎯</span>",
     "url": "",
     "position": "#menu_row2_village",
     "method": "append",
     "style": "",
     "containerStyle": "background-color: #212529 !important; border: 1px solid #343a40; border-radius: 4px; padding: 5px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.6); width: 170px; z-index: 1000005 !important;",
-    "itemStyle": "display: flex; align-items: center; padding: 12px 15px; color: #ffffff !important; text-decoration: none !important; font-size: 13px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
+    "itemStyle": "display: flex; align-items: center; padding: 12px 15px; color: #ffffff !important; text-decoration: none !important; font-size: 14px; border-bottom: 1px solid #343a40; font-family: sans-serif;",
     "items": [
       { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
       { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
