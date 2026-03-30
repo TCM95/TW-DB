@@ -1,24 +1,32 @@
-javascript:(function(){
-    const table = document.getElementById('units_table');
-    if(!table) return UI.ErrorMessage('Brak tabeli wojska!');
+/* * Autor: Gal Anonim (TCM)
+ * Nazwa: Etykiety_Wojsko
+ */
+const TWD_Wojsko = {
+    init: function() {
+        const table = document.getElementById('units_table');
+        if (!table || document.getElementById('twd-units-btn')) return;
 
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.innerHTML = '1. Kopiuj / 2. Kliny';
-    btn.style.margin = '10px';
+        const btn = document.createElement('button');
+        btn.id = 'twd-units-btn';
+        btn.type = 'button';
+        btn.className = 'btn';
+        btn.style.margin = '10px';
+        btn.innerHTML = '1. Kopiuj Wojska';
 
-    let clicked = false;
-    btn.onclick = function(e){
-        e.preventDefault();
-        if(!clicked){
-            localStorage.setItem('twd_import_data', table.outerHTML);
-            btn.innerHTML = 'KLIKNIJ: Otwórz Kliny';
-            btn.style.backgroundColor = 'green';
-            btn.style.color = 'white';
-            clicked = true;
-        } else {
-            window.open('https://twdatabase.online/Wedges/My', '_blank');
-        }
-    };
-    table.parentNode.insertBefore(btn, table);
-})();
+        let state = 1;
+        btn.onclick = (e) => {
+            e.preventDefault();
+            if (state === 1) {
+                localStorage.setItem('twd_import_data', table.outerHTML);
+                btn.innerHTML = '2. Otwórz Kliny';
+                btn.style.backgroundColor = '#217312';
+                btn.style.color = 'white';
+                state = 2;
+            } else {
+                window.open('https://twdatabase.online/Wedges/My', '_blank');
+            }
+        };
+        table.parentNode.insertBefore(btn, table);
+    }
+};
+TWD_Wojsko.init();
