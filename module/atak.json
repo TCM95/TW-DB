@@ -1,28 +1,10 @@
-/* * Autor: Gal Anonim (TCM)
- * Nazwa: Etykiety_Ataki_DualClick
- */
-(function() {
-    const targetUrl = 'https://twdatabase.online/Attacks';
-    [span_9](start_span)const area = document.querySelector('#simple_message'); //[span_9](end_span)
-    if (!area) return;
-
-    const btn = document.createElement('button');
-    btn.innerHTML = '1. Kopiuj Ataki';
-    btn.className = 'btn';
-    btn.style.backgroundColor = '#217312'; [span_10](start_span)// Zielony jak w Twoim opisie[span_10](end_span)
-    btn.style.color = 'white';
-    
-    let clicked = false;
-    btn.onclick = function(e) {
-        e.preventDefault();
-        if (!clicked) {
-            localStorage.setItem('twd_import_data', area.value || area.innerText);
-            btn.innerHTML = '2. Przejdź do TWD';
-            btn.style.backgroundColor = '#800000'; [span_11](start_span)[span_12](start_span)// Czerwone kółko/styl[span_11](end_span)[span_12](end_span)
-            clicked = true;
-        } else {
-            window.open(targetUrl, '_blank');
-        }
-    };
-    area.parentNode.insertBefore(btn, area);
-})();
+[
+  {
+    "page": "screen=reqdef",
+    "label": "<img src='https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp' style='vertical-align:-3px; margin-right:4px;'> Etykiety: Import Ataków",
+    "url": "javascript:(function(){ /* Autor: Gal Anonim */ if(!window.twdCopyA){ var a=document.getElementById('simple_message'); if(!a)return; localStorage.setItem('twd_import_data', a.value.replace(/\\/g, '')); window.twdCopyA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdCopyA=false; } })();",
+    "position": "#simple_message",
+    "method": "before",
+    "style": "background: #217312 !important; color: white !important; padding: 5px 10px !important; margin-bottom: 5px; cursor: pointer; display: inline-block; border-radius: 4px; font-weight: bold;"
+  }
+]
