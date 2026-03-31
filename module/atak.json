@@ -3,8 +3,9 @@
     "page": "screen=reqdef",
     "label": "🎯 Import",
     "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', c); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.twdA=false; window.location.assign('https://twdatabase.online/Attacks'); } })());",
-    "position": "th[style*='white-space:nowrap']",
+    "position": "td[colspan='3']",
     "method": "append",
-    "style": "margin-left: 25px; background: url('https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/btn/bg.webp') repeat-x center top; border: 1px solid #714619; border-radius: 3px; padding: 3px 8px; color: #fff; font-weight: bold; cursor: pointer;"
+    "class": "btn",
+    "style": "margin-left: 5px;"
   }
 ]
