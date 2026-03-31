@@ -2,10 +2,10 @@
   {
     "page": "screen=reqdef",
     "label": "🎯 Import",
-    "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', c); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.twdA=false; window.location.assign('https://twdatabase.online/Attacks'); } })());",
+    "class": "btn",
+    "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c=a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', c); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.twdA=false; window.location.href='https://twdatabase.online/Attacks'; } })());",
     "position": "td[colspan='3']",
     "method": "append",
-    "class": "btn",
     "style": "margin-left: 5px;"
   }
 ]
