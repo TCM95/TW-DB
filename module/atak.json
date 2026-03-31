@@ -2,7 +2,7 @@
   {
     "page": "screen=reqdef",
     "label": "🎯 Import",
-    "url": "javascript:(function(){ console.log('%c[TCM] 🎯 Skrypt Ataki: Akcja!', 'color: #00ffff; font-size: 14px; font-weight: bold; text-shadow: 1px 1px #000;'); var a=document.getElementById('simple_message'); if(!a){ console.error('[TCM] Błąd: Nie znaleziono pola #simple_message'); return; } if(!window.twdA){ var cleanData = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', cleanData); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie, aby otworzyć bazę.', 2000); console.log('[TCM] Dane zapisane w localStorage.'); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
+    "url": "javascript:(function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var cleanData = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', cleanData); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
     "position": "label[for='select_all']",
     "method": "after",
     "style": "margin-left: 15px; cursor: pointer; vertical-align: middle;"
