@@ -26,5 +26,9 @@
   {
     "type": "contextButtons",
     "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/wojsko.json"
+  },
+  {
+    "type": "contextButtons",
+    "url": "https://raw.githubusercontent.com/TCM95/TW-DB/main/module/import_rap.json"
   }
 ]
