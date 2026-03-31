@@ -1,10 +1,10 @@
 [
   {
     "page": "screen=reqdef",
-    "label": "<img src='https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp' style='vertical-align:-3px; margin-right:4px;'> Etykiety: Import Ataków",
-    "url": "javascript:(function(){ /* Autor: Gal Anonim */ if(!window.twdCopyA){ var a=document.getElementById('simple_message'); if(!a)return; localStorage.setItem('twd_import_data', a.value.replace(/\\/g, '')); window.twdCopyA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdCopyA=false; } })();",
-    "position": "#simple_message",
-    "method": "before",
-    "style": "background: #217312 !important; color: white !important; padding: 5px 10px !important; margin-bottom: 5px; cursor: pointer; display: inline-block; border-radius: 4px; font-weight: bold;"
+    "label": "🎯 Importuj",
+    "url": "javascript:(function(){ /* Autor: Gal Anonim */ if(!window.twdA){ var a=document.getElementById('simple_message'); if(!a)return; localStorage.setItem('twd_import_data', a.value.replace(/\\/g, '')); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
+    "position": "input[value='Zaktualizuj tekst']",
+    "method": "after",
+    "style": "margin-left: 5px;"
   }
 ]
