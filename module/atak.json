@@ -2,9 +2,9 @@
   {
     "page": "screen=reqdef",
     "label": "🎯 Importuj",
-    "url": "javascript:(function(){ console.log('%c[TCM MODULE] Ataki: Próba załadowania...', 'color: #00ff00; font-weight: bold; font-size: 14px;'); var a=document.getElementById('simple_message'); if(!a){ console.error('[TCM] Nie znaleziono #simple_message'); return; } if(!window.twdA){ localStorage.setItem('twd_import_data', a.value.replace(/\\/g, '')); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
+    "url": "javascript:(function(){ console.log('%c[TCM] 🎯 Inicjacja Ataki...', 'color: #fbff00; font-size: 16px; font-weight: bold; text-shadow: 1px 1px #000;'); var a=document.getElementById('simple_message'); if(!a){ console.error('[TCM] Nie znaleziono pola tekstowego!'); return; } if(!window.twdA){ var val = a.value || a.innerText; localStorage.setItem('twd_import_data', val.replace(/\\/g, '')); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); console.log('[TCM] Dane zapisane w localStorage.'); } else { console.log('[TCM] Przekierowanie...'); window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
     "position": "input[value='Zaktualizuj tekst']",
     "method": "after",
-    "style": "margin-left: 5px; border: 1px solid #000; font-weight: bold;"
+    "style": "margin-left: 5px;"
   }
 ]
