@@ -4,8 +4,8 @@
     "label": "🎯 Import",
     "class": "btn",
     "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c=a.value.replace(/\\/g, ''); a.value=c; a.focus(); a.select(); a.setSelectionRange(0, 99999); try { document.execCommand('copy'); UI.SuccessMessage('Skopiowano! Kliknij ponownie, by wejść do bazy.', 2000); window.twdA=true; } catch(err) { UI.ErrorMessage('Błąd kopiowania'); } } else { window.twdA=false; window.location.assign('https://twdatabase.online/Attacks'); } })());",
-    "position": "input[value='Zaktualizuj tekst']",
-    "method": "after",
-    "style": "margin-left: 5px;"
+    "position": "form#edit_request_form div, form#edit_request_form td[colspan='3']",
+    "method": "append",
+    "style": "margin-left: 5px; margin-top: 2px;"
   }
 ]
