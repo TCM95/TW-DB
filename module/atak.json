@@ -2,9 +2,9 @@
   {
     "page": "screen=reqdef",
     "label": "🎯 Import",
-    "url": "javascript:(function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var cleanData = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', cleanData); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.twdA=false; window.open('https://twdatabase.online/Attacks','_blank'); } })(); void(0);",
+    "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', c); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.twdA=false; window.location.assign('https://twdatabase.online/Attacks'); } })());",
     "position": "th[style*='white-space:nowrap']",
     "method": "append",
-    "style": "margin-left: 10px; display: inline-block; padding: 3px 12px; background: #94713d linear-gradient(to bottom, #94713d 0%, #7b592d 100%); border: 1px solid #211d17; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer; font-size: 13px; text-decoration: none; vertical-align: middle; box-shadow: 0 1px 2px rgba(0,0,0,0.5); text-shadow: 1px 1px 1px #000;"
+    "style": "margin-left: 25px; background: url('https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/btn/bg.webp') repeat-x center top; border: 1px solid #714619; border-radius: 3px; padding: 3px 8px; color: #fff; font-weight: bold; cursor: pointer;"
   }
 ]
