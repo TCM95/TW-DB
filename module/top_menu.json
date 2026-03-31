@@ -10,7 +10,9 @@
       { "label": "🔥 Rozpiski", "url": "https://twdatabase.online/AttackPlanner/Show" },
       { "label": "🛡️ Obstawy", "url": "https://twdatabase.online/Guards" },
       { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
-      { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" }
+      { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" },
+      { "label": "🏆 Ranking", "url": "https://twdatabase.online/Ranking" },
+      { "label": "📊 Staty", "url": "https://twdatabase.online/Statistics" }
     ]
   }
 ]
