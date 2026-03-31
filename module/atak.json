@@ -3,7 +3,7 @@
     "page": "screen=reqdef",
     "label": "🎯 Import",
     "class": "btn",
-    "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c=a.value.replace(/\\/g, ''); a.value=c; a.select(); a.setSelectionRange(0, 99999); document.execCommand('copy'); window.twdA=true; UI.SuccessMessage('Skopiowano do schowka! Kliknij ponownie.', 2000); } else { window.twdA=false; window.location.href='https://twdatabase.online/Attacks'; } })());",
+    "url": "javascript:void((function(){ var a=document.getElementById('simple_message'); if(!a) return; if(!window.twdA){ var c=a.value.replace(/\\/g, ''); a.value=c; a.focus(); a.select(); a.setSelectionRange(0, 99999); try { document.execCommand('copy'); UI.SuccessMessage('Skopiowano! Kliknij ponownie, by wejść do bazy.', 2000); window.twdA=true; } catch(err) { UI.ErrorMessage('Błąd kopiowania'); } } else { window.twdA=false; window.location.assign('https://twdatabase.online/Attacks'); } })());",
     "position": "input[value='Zaktualizuj tekst']",
     "method": "after",
     "style": "margin-left: 5px;"
