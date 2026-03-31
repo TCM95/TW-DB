@@ -1,32 +1,10 @@
-/* * Autor: Gal Anonim (TCM)
- * Nazwa: Etykiety_Wojsko
- */
-const TWD_Wojsko = {
-    init: function() {
-        const table = document.getElementById('units_table');
-        if (!table || document.getElementById('twd-units-btn')) return;
-
-        const btn = document.createElement('button');
-        btn.id = 'twd-units-btn';
-        btn.type = 'button';
-        btn.className = 'btn';
-        btn.style.margin = '10px';
-        btn.innerHTML = '1. Kopiuj Wojska';
-
-        let state = 1;
-        btn.onclick = (e) => {
-            e.preventDefault();
-            if (state === 1) {
-                localStorage.setItem('twd_import_data', table.outerHTML);
-                btn.innerHTML = '2. Otwórz Kliny';
-                btn.style.backgroundColor = '#217312';
-                btn.style.color = 'white';
-                state = 2;
-            } else {
-                window.open('https://twdatabase.online/Wedges/My', '_blank');
-            }
-        };
-        table.parentNode.insertBefore(btn, table);
-    }
-};
-TWD_Wojsko.init();
+[
+  {
+    "page": "screen=overview_villages",
+    "label": "<img src='https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp' style='vertical-align:-3px; margin-right:4px;'> Etykiety: Import Wojska",
+    "url": "javascript:(function(){ /* Autor: Gal Anonim */ if(!window.twdCopyW){ var t=document.getElementById('units_table'); if(!t)return; localStorage.setItem('twd_import_data', t.outerHTML); window.twdCopyW=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie.', 2000); } else { window.open('https://twdatabase.online/Wedges/My','_blank'); window.twdCopyW=false; } })();",
+    "position": "#units_table",
+    "method": "before",
+    "style": "background: #217312 !important; color: white !important; padding: 5px 10px !important; margin-bottom: 5px; cursor: pointer; display: inline-block; border-radius: 4px; font-weight: bold;"
+  }
+]
