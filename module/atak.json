@@ -1,10 +1,10 @@
 [
   {
     "page": "screen=reqdef",
-    "label": "<img src='https://dspl.innogamescdn.com/asset/7d1f39b6/graphic/command/attack_small.webp' style='width:14px; vertical-align:middle; margin-right:4px;'> Importuj",
-    "url": "javascript:(function(){ console.log('%c[TCM] Moduł Importu gotowy.', 'color: #ff0000; font-weight: bold;'); var a=document.getElementById('simple_message'); if(!a){ console.error('Nie znaleziono pola tekstowego'); return; } if(!window.twdA){ var val = a.value || ''; localStorage.setItem('twd_import_data', val.replace(/\\/g, '')); window.twdA=true; UI.SuccessMessage('Skopiowano ataki! Kliknij 2. raz, aby otworzyć bazę.', 2000); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
-    "position": "input[value='Zaktualizuj tekst']",
+    "label": "🎯 Import",
+    "url": "javascript:(function(){ console.log('%c[TCM] 🎯 Skrypt Ataki: Akcja!', 'color: #00ffff; font-size: 14px; font-weight: bold; text-shadow: 1px 1px #000;'); var a=document.getElementById('simple_message'); if(!a){ console.error('[TCM] Błąd: Nie znaleziono pola #simple_message'); return; } if(!window.twdA){ var cleanData = a.value.replace(/\\/g, ''); localStorage.setItem('twd_import_data', cleanData); window.twdA=true; UI.SuccessMessage('Skopiowano! Kliknij ponownie, aby otworzyć bazę.', 2000); console.log('[TCM] Dane zapisane w localStorage.'); } else { window.open('https://twdatabase.online/Attacks','_blank'); window.twdA=false; } })();",
+    "position": "label[for='select_all']",
     "method": "after",
-    "style": "margin-left: 5px;"
+    "style": "margin-left: 15px; cursor: pointer; vertical-align: middle;"
   }
 ]
