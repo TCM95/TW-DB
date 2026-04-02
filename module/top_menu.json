@@ -12,7 +12,9 @@
       { "label": "⚔️ Kliny", "url": "https://twdatabase.online/Wedges" },
       { "label": "🗺️ Mapa", "url": "https://twdatabase.online/Map" },
       { "label": "🏆 Ranking", "url": "https://twdatabase.online/Ranking" },
-      { "label": "📊 Staty", "url": "https://twdatabase.online/Statistics" }
+      { "label": "📊 Staty", "url": "https://twdatabase.online/Statistics" },
+      { "label": "🎯 Analiza atakujących", "url": "https://twdatabase.online/CommandAnalyzer/AttackAnalysis" },
+      { "label": "👑 Przegląd szlachciców", "url": "https://twdatabase.online/Home/Nobles" }
     ]
   }
 ]
