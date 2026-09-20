@@ -1,7 +1,7 @@
 [
   {
     "page": "screen=reqdef",
-    "label": "<a class=\"btn\" href=\"#\" style=\"margin-left:5px;\" onclick=\"try{var ta=document.getElementById('simple_message');if(!ta){UI.ErrorMessage('Nie znaleziono pola',2000);return false;}if(!window.twdA){var txt=(ta.value||'').replace(/\\\\/g,'');navigator.clipboard.writeText(txt).then(function(){UI.SuccessMessage('Skopiowano bezinwazyjnie! Kliknij ponownie, aby otworzyć bazę.',2500);window.twdA=true;}).catch(function(){UI.ErrorMessage('Błąd kopiowania API',2000);});}else{window.twdA=false;window.open('https://twdatabase.online/Attacks','_blank','noopener,noreferrer');}return false;}catch(err){UI.ErrorMessage('Błąd: '+err.message,2500);return false;}\">🎯 Import</a>",
+    "label": "<a class=\"btn\" href=\"#\" style=\"margin-left:5px;\" onclick=\"try{var ta=document.getElementById('simple_message');if(!ta){UI.ErrorMessage('Nie znaleziono pola',2000);return false;}if(!window.twdA){var txt=(ta.value||'').replace(/\\\\/g,'');navigator.clipboard.writeText(txt).then(function(){UI.SuccessMessage('Skopiowano bezinwazyjnie! Kliknij ponownie, aby otworzyć bazę.',2500);window.twdA=true;}).catch(function(){UI.ErrorMessage('Błąd kopiowania API',2000);});}else{window.twdA=false;window.open('https://twdatabase.online/attacks','_blank','noopener,noreferrer');}return false;}catch(err){UI.ErrorMessage('Błąd: '+err.message,2500);return false;}\">🎯 Import</a>",
     "position": "form#reqdef_form td[colspan='3']",
     "method": "append"
   }
