@@ -7,6 +7,7 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_addStyle
 // @connect      raw.githubusercontent.com
 // @run-at       document-start
 // ==/UserScript==
@@ -16,6 +17,7 @@
 
     const MASTER_CONFIG = 'https://raw.githubusercontent.com/TCM95/TW-DB/refs/heads/main/confing.json';
     const APP_NAME = 'TWDB_ENGINE';
+    const ANALYSIS_KEY = `${APP_NAME}:analysis`;
 
     const App = {
         modules: [],
@@ -26,8 +28,8 @@
         }
     };
 
-    const isPlemiona = () => /\.plemiona\.pl$/i.test(location.hostname) || /plemiona\.pl/i.test(location.hostname);
-    const isTWDatabase = () => /twdatabase\.online$/i.test(location.hostname);
+    const isPlemiona = () => /(^|\.)plemiona\.pl$/i.test(location.hostname);
+    const isTWDatabase = () => /(^|\.)twdatabase\.online$/i.test(location.hostname);
 
     const fetchJson = (url) => {
         if (App.cache[url]) return Promise.resolve(App.cache[url]);
@@ -57,14 +59,13 @@
             data,
             mounted: false,
             init() {
-                if (!isPlemiona()) return;
-                if (this.mounted) return;
+                if (!isPlemiona() || this.mounted) return;
                 this.render();
                 this.mounted = true;
             },
             destroy() {
                 if (!isPlemiona()) return;
-                const key = `tcm-mod-${this.data.page.replace(/\W/g, '')}`;
+                const key = `tcm-mod-${String(this.data.page || '').replace(/\W/g, '')}`;
                 document.querySelectorAll(`[data-tcm="${key}"]`).forEach((el) => el.remove());
                 this.mounted = false;
             },
@@ -91,34 +92,34 @@
             if (target.querySelector(`[data-tcm="${key}"]`)) return;
 
             let html = '';
-            if (/<[a-z][\s\S]*>/i.test(i.label)) {
+            if (/<[a-z][\s\S]*>/i.test(i.label || '')) {
                 html = i.label.trim();
             } else {
                 const style = i.style ? `style="${i.style}"` : '';
                 const href = (i.url || '#').replace('{id}', id);
-                html = `<a href="${href}" class="btn" target="_blank" ${style}>${i.label}</a>`;
+                html = `<a href="${href}" class="btn" target="_blank" ${style}>${i.label || ''}</a>`;
             }
 
-            let position;
-            switch (i.method) {
-                case 'append': position = 'beforeend'; break;
-                case 'prepend': position = 'afterbegin'; break;
-                case 'before': position = 'beforebegin'; break;
-                case 'after': position = 'afterend'; break;
-                default: position = 'beforeend';
-            }
-
+            const positionMap = {
+                append: 'beforeend',
+                prepend: 'afterbegin',
+                before: 'beforebegin',
+                after: 'afterend'
+            };
+            const position = positionMap[i.method] || 'beforeend';
             target.insertAdjacentHTML(position, html);
 
-            const addedEl = (position === 'beforeend' || position === 'afterbegin')
-                ? (position === 'beforeend' ? target.lastElementChild : target.firstElementChild)
-                : (position === 'afterend' ? target.nextElementSibling : target.previousElementSibling);
+            const addedEl = position === 'beforeend'
+                ? target.lastElementChild
+                : position === 'afterbegin'
+                    ? target.firstElementChild
+                    : position === 'afterend'
+                        ? target.nextElementSibling
+                        : target.previousElementSibling;
 
             if (addedEl) {
                 addedEl.dataset.tcm = key;
-                if (i.items && Array.isArray(i.items)) {
-                    attachDropdown(addedEl, i);
-                }
+                if (Array.isArray(i.items)) attachDropdown(addedEl, i);
             }
         });
     }
@@ -130,30 +131,27 @@
 
         config.items.forEach((sub) => {
             const item = document.createElement('a');
-            item.href = sub.url;
-            item.innerHTML = sub.label;
+            item.href = sub.url || '#';
+            item.textContent = sub.label || '';
             item.style.cssText = config.itemStyle || 'display:block;padding:12px;color:white;text-decoration:none;border-bottom:1px solid #333;';
             item.target = '_blank';
             list.appendChild(item);
         });
 
         document.body.appendChild(list);
-
         parent.addEventListener('click', (e) => {
             if (parent.tagName === 'A' && parent.getAttribute('href') === '#') e.preventDefault();
             e.stopPropagation();
-            const isVisible = list.style.display === 'block';
+            const visible = list.style.display === 'block';
             document.querySelectorAll('.tcm-dropdown-menu').forEach((m) => m.style.display = 'none');
-
-            if (!isVisible) {
+            if (!visible) {
                 list.style.display = 'block';
                 const r = parent.getBoundingClientRect();
-                list.style.top = (r.bottom + window.scrollY) + 'px';
-                list.style.left = (r.left + window.scrollX) + 'px';
+                list.style.top = `${r.bottom + window.scrollY}px`;
+                list.style.left = `${r.left + window.scrollX}px`;
             }
         });
-
-        document.addEventListener('click', () => list.style.display = 'none');
+        document.addEventListener('click', () => { list.style.display = 'none'; }, { once: false });
     }
 
     function waitForElement(selector, timeout = 15000) {
@@ -161,14 +159,8 @@
             const started = Date.now();
             const check = () => {
                 const el = document.querySelector(selector);
-                if (el) {
-                    resolve(el);
-                    return;
-                }
-                if (Date.now() - started >= timeout) {
-                    reject(new Error(`Nie znaleziono elementu: ${selector}`));
-                    return;
-                }
+                if (el) return resolve(el);
+                if (Date.now() - started >= timeout) return reject(new Error(`Nie znaleziono elementu: ${selector}`));
                 requestAnimationFrame(check);
             };
             check();
@@ -177,31 +169,22 @@
 
     function setTextareaValue(textarea, value) {
         const descriptor = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
-        if (descriptor && descriptor.set) {
-            descriptor.set.call(textarea, value);
-        } else {
-            textarea.value = value;
-        }
-
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        textarea.dispatchEvent(new Event('change', { bubbles: true }));
-        textarea.dispatchEvent(new Event('keyup', { bubbles: true }));
+        if (descriptor && descriptor.set) descriptor.set.call(textarea, value);
+        else textarea.value = value;
+        ['input', 'change', 'keyup'].forEach((type) => textarea.dispatchEvent(new Event(type, { bubbles: true })));
     }
 
     async function handleTWDatabasePage() {
         const path = location.pathname.toLowerCase();
         if (!['/reports', '/attacks'].includes(path)) return;
-
-        const textareaSelector = '.import-textarea';
         try {
-            const textarea = await waitForElement(textareaSelector, 10000);
+            const textarea = await waitForElement('.import-textarea', 10000);
             const stored = GM_getValue(`${APP_NAME}:clipboard`, '');
             if (!stored || !stored.trim()) return;
-
-            setTextareaValue(textarea, stored.trim());
-
+            setTextareaValue(textarea, stored);
             const submit = document.querySelector('form.import-form button[type="submit"]');
-            if (submit && !submit.disabled) {
+            if (submit && !submit.disabled && !textarea.dataset.tcmImported) {
+                textarea.dataset.tcmImported = '1';
                 setTimeout(() => submit.click(), 150);
             }
         } catch (e) {
@@ -211,23 +194,184 @@
 
     function handlePlemionaImportButtons() {
         if (!isPlemiona()) return;
-        const currentUrl = location.href;
-        if (!/screen=mail|screen=reqdef|screen=info_player|screen=report/i.test(currentUrl)) return;
-
+        if (!/screen=mail|screen=reqdef|screen=info_player|screen=report/i.test(location.href)) return;
         const ta = document.getElementById('message') || document.getElementById('simple_message');
-        if (!ta) return;
+        if (ta && ta.value.trim()) GM_setValue(`${APP_NAME}:clipboard`, ta.value);
+    }
 
-        const current = (ta.value || '').trim();
-        if (current) {
-            GM_setValue(`${APP_NAME}:clipboard`, current);
+    // ==================== ANALIZY TWDB ====================
+
+    function getCoordinates(element) {
+        const match = (element?.textContent || '').match(/\b(\d{1,3}\|\d{1,3})\b/);
+        return match ? match[1] : null;
+    }
+
+    function getBadgeColor(badge) {
+        if (badge.classList.contains('village-analysis-badge--warn') || badge.classList.contains('village-analysis-badge--bad')) return '#ff4d4d';
+        if (badge.classList.contains('village-analysis-badge--good')) return '#31c908';
+        if (badge.classList.contains('village-analysis-badge--info')) return '#0d83dd';
+        return '#708090';
+    }
+
+    function collectTWDBAnalyses() {
+        const data = [];
+        document.querySelectorAll('table.ap-table tbody tr').forEach((row) => {
+            const cells = row.querySelectorAll(':scope > td');
+            const target = getCoordinates(cells[1]);
+            const origin = getCoordinates(cells[2]);
+            const analysisCell = cells[8];
+            if (!target || !origin || !analysisCell) return;
+
+            const badges = [];
+            const colors = [];
+            analysisCell.querySelectorAll('.village-analysis-badge').forEach((badge) => {
+                const text = badge.textContent.trim();
+                if (!text) return;
+                badges.push(text);
+                colors.push(getBadgeColor(badge));
+            });
+
+            if (badges.length) data.push({ t: target, o: origin, a: `[${badges.join('|')}]`, c: colors });
+        });
+        return data;
+    }
+
+    function addTWDBAnalysisButton() {
+        if (!isTWDatabase() || document.querySelector('#tcm-save-analysis')) return;
+        if (!document.querySelector('table.ap-table')) return;
+
+        const button = document.createElement('button');
+        button.id = 'tcm-save-analysis';
+        button.type = 'button';
+        button.textContent = 'Zapisz analizy do gry';
+        button.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:999999;padding:10px 15px;border:1px solid #3e4147;border-radius:4px;background:#2e7a2e;color:white;font-weight:bold;cursor:pointer;';
+
+        button.addEventListener('click', () => {
+            const data = collectTWDBAnalyses();
+            if (!data.length) {
+                button.textContent = 'Brak analiz do zapisania';
+                setTimeout(() => { button.textContent = 'Zapisz analizy do gry'; }, 3000);
+                return;
+            }
+            GM_setValue(ANALYSIS_KEY, JSON.stringify(data));
+            button.textContent = `Zapisano: ${data.length} ataków`;
+            setTimeout(() => { button.textContent = 'Zapisz analizy do gry'; }, 4000);
+        });
+        document.body.appendChild(button);
+    }
+
+    function readAnalyses() {
+        try {
+            const value = GM_getValue(ANALYSIS_KEY, '[]');
+            const data = typeof value === 'string' ? JSON.parse(value) : value;
+            return Array.isArray(data) ? data : [];
+        } catch (_) {
+            return [];
         }
+    }
+
+    function getIncomingRows() {
+        return Array.from(document.querySelectorAll('#incomings_table tbody tr, #incomings_table tr.nowrap'));
+    }
+
+    function getIncomingCoords(row) {
+        const cells = row.querySelectorAll(':scope > td');
+        let target = getCoordinates(cells[1]);
+        let origin = getCoordinates(cells[2]);
+        if (!target || !origin) {
+            const coords = [...(row.textContent || '').matchAll(/\b\d{1,3}\|\d{1,3}\b/g)].map((m) => m[0]);
+            target = target || coords[0];
+            origin = origin || coords[1];
+        }
+        return { target, origin };
+    }
+
+    function colorIncomingRows() {
+        const analyses = readAnalyses();
+        getIncomingRows().forEach((row) => {
+            const { target, origin } = getIncomingCoords(row);
+            const found = analyses.find((item) => item.t === target && item.o === origin);
+            const cell = row.querySelector(':scope > td');
+            if (found && cell && Array.isArray(found.c)) {
+                cell.style.background = found.c.length === 1 ? found.c[0] : `linear-gradient(to right, ${found.c.map((c, i) => `${c} ${i * 100 / found.c.length}% ${(i + 1) * 100 / found.c.length}%`).join(', ')})`;
+            }
+        });
+    }
+
+    function findRenameButton(row) {
+        return row.querySelector('.rename-icon, [data-action="rename"], [class*="rename"], a[href*="rename"]');
+    }
+
+    function findLabel(row) {
+        return row.querySelector('.quickedit-label, .command-label, [class*="label"]');
+    }
+
+    function renameCommand(row, label) {
+        const rename = findRenameButton(row);
+        if (!rename) return false;
+        rename.click();
+        setTimeout(() => {
+            const input = row.querySelector('input[type="text"], input.quickedit-edit, input[name*="label"], input[name*="name"]');
+            if (!input) return;
+            const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+            if (setter) setter.call(input, label); else input.value = label;
+            ['input', 'change', 'keyup'].forEach((type) => input.dispatchEvent(new Event(type, { bubbles: true })));
+            const save = row.querySelector('input[type="button"], button[type="submit"], .quickedit-save');
+            if (save) save.click();
+            else input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true }));
+        }, 250);
+        return true;
+    }
+
+    function addPlemionaAnalysisButton() {
+        if (!isPlemiona() || document.querySelector('#tcm-analyse-incomings')) return;
+        const table = document.querySelector('#incomings_table');
+        if (!table) return;
+        const header = table.querySelector('thead tr') || table.querySelector('tr');
+        const firstHeader = header?.querySelector('th');
+        if (!firstHeader) return;
+
+        const button = document.createElement('button');
+        button.id = 'tcm-analyse-incomings';
+        button.type = 'button';
+        button.textContent = 'Analizuj';
+        button.style.cssText = 'margin-left:8px;padding:3px 8px;cursor:pointer;font-weight:bold;';
+        firstHeader.appendChild(button);
+
+        button.addEventListener('click', () => {
+            const analyses = readAnalyses();
+            if (!analyses.length) {
+                alert('Brak zapisanych analiz z TWDB.');
+                return;
+            }
+
+            let delay = 0;
+            let count = 0;
+            getIncomingRows().forEach((row) => {
+                const { target, origin } = getIncomingCoords(row);
+                const found = analyses.find((item) => item.t === target && item.o === origin);
+                if (!found || !found.a) return;
+
+                const labelElement = findLabel(row);
+                const current = labelElement ? labelElement.textContent.trim() : '';
+                if (current.includes(found.a)) return;
+
+                const clean = current.replace(/\[[^\]]*]/g, '').replace(/\s+/g, ' ').trim();
+                const newLabel = clean ? `${clean} ${found.a}` : found.a;
+                setTimeout(() => renameCommand(row, newLabel), delay);
+                delay += 1300;
+                count++;
+            });
+
+            button.textContent = count ? `Zmieniono: ${count}` : 'Brak pasujących komend';
+            setTimeout(() => { button.textContent = 'Analizuj'; }, 4000);
+        });
     }
 
     async function initPlemionaModules() {
         if (!isPlemiona()) return;
         const master = await fetchJson(MASTER_CONFIG);
         if (!master || !Array.isArray(master)) return;
-
         for (const mod of master) {
             const raw = await fetchJson(mod.url);
             if (!raw) continue;
@@ -243,39 +387,36 @@
         if (isPlemiona()) {
             const currentUrl = location.href;
             const currentVillage = new URLSearchParams(location.search).get('village');
-
             if (currentUrl !== App.state.url || currentVillage !== App.state.village) {
                 App.state.url = currentUrl;
                 App.state.village = currentVillage;
-                App.modules.forEach((m) => {
-                    m.destroy();
-                    m.init();
-                });
+                App.modules.forEach((m) => { m.destroy(); m.init(); });
             } else {
                 App.modules.forEach((m) => m.init());
             }
-
             handlePlemionaImportButtons();
+            addPlemionaAnalysisButton();
+            colorIncomingRows();
         }
-
         if (isTWDatabase()) {
             handleTWDatabasePage();
+            addTWDBAnalysisButton();
         }
     });
 
-    if (document.body) {
-        observer.observe(document.body, { childList: true, subtree: true });
-    } else {
-        window.addEventListener('DOMContentLoaded', () => {
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
+    function start() {
+        if (document.body) observer.observe(document.body, { childList: true, subtree: true });
+        if (isTWDatabase()) {
+            handleTWDatabasePage();
+            addTWDBAnalysisButton();
+        }
+        if (isPlemiona()) {
+            initPlemionaModules();
+            addPlemionaAnalysisButton();
+            colorIncomingRows();
+        }
     }
 
-    if (isTWDatabase()) {
-        handleTWDatabasePage();
-    }
-
-    if (isPlemiona()) {
-        initPlemionaModules();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+    else start();
 })();
