@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.6
+// @version      4.7
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -21,16 +21,14 @@
     const isPlemiona = /(^|\.)plemiona\.pl$/i.test(location.hostname);
     
     let cachedAnalysisArray = null;
-    let isAutoRenaming = false; // Flaga blokująca klawiaturę na telefonach
+    let isAutoRenaming = false; 
 
-    // Przechwytywacz zapobiegający otwieraniu klawiatury podczas automatu
-    document.addEventListener('focusin', (e) => {
-        if (isAutoRenaming && e.target && e.target.tagName === 'INPUT') {
-            e.target.blur();
-            e.target.setAttribute('readonly', 'true'); // Wymuszenie fizycznej blokady
-            setTimeout(() => e.target.removeAttribute('readonly'), 50);
-        }
-    });
+    // OSTATECZNA BLOKADA KLAWIATURY NA TELEFONACH - Nadpisanie natywnej funkcji przeglądarki
+    const originalFocus = HTMLInputElement.prototype.focus;
+    HTMLInputElement.prototype.focus = function() {
+        if (isAutoRenaming) return; // Jeśli automat działa, ignorujemy żądanie wysunięcia klawiatury
+        originalFocus.apply(this, arguments);
+    };
 
     /*
      * ============================
@@ -266,20 +264,14 @@
     }
 
     function getIncomingRows() {
-        return Array.from(document.querySelectorAll('#incomings_table tr.nowrap, #incomings_table tbody tr, table#incomings_table tr'));
+        return Array.from(document.querySelectorAll('#incomings_table tr.nowrap, #incomings_table tbody tr, table#incomings_table tr')).filter(row => row.querySelector('td'));
     }
 
     function getIncomingCoordinates(row) {
-        const cells = Array.from(row.querySelectorAll(':scope > td'));
-        let target = getCoordinates(cells[1]);
-        let origin = getCoordinates(cells[2]);
-
-        if (!target || !origin) {
-            const coordinates = Array.from((row.textContent || '').matchAll(/\b\d{1,3}\|\d{1,3}\b/g)).map((match) => match[0]);
-            target = target || coordinates[0] || null;
-            origin = origin || coordinates[1] || null;
-        }
-
+        // Nowa, bardziej niezawodna metoda: szukamy wszystkich koordynatów w tekście całego wiersza
+        const coords = Array.from((row.textContent || '').matchAll(/\b(\d{1,3}\|\d{1,3})\b/g)).map(m => m[1]);
+        let target = coords[0] || null;
+        let origin = coords[1] || null;
         return { target, origin };
     }
 
@@ -349,17 +341,24 @@
         const rows = getIncomingRows();
         
         rows.forEach((row) => {
-            const firstCell = row.querySelector(':scope > td');
-            if (!firstCell) return;
+            // Celujemy w komórkę z nazwą ataku (quickedit), a nie tylko pierwszą (która bywa małym checkbocem)
+            const labelCell = row.querySelector('.quickedit') ? row.querySelector('.quickedit').closest('td') : row.querySelector('td:nth-child(2)');
+            if (!labelCell) return;
             
-            // Sprawdzenie "fizyczne" zamiast flagi tekstowej - odporne na dynamiczne odświeżanie czasu w grze
-            if (firstCell.style.getPropertyValue('background').includes('linear-gradient')) return;
+            if (labelCell.style.getPropertyValue('background').includes('linear-gradient')) return;
 
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
             if (match && Array.isArray(match.c)) {
-                firstCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
+                // Kolorujemy komórkę z nazwą
+                labelCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
+                
+                // Opcjonalnie: kolorujemy również komórkę obok (z czasem), dla lepszej widoczności
+                const nextCell = labelCell.nextElementSibling;
+                if (nextCell && nextCell.tagName === 'TD') {
+                    nextCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
+                }
             }
         });
     }
@@ -400,7 +399,7 @@
         let changesCount = 0;
         let alreadyLabeledCount = 0;
 
-        // Włączenie blokady klawiatury dla urządzeń mobilnych przed startem pętli
+        // WŁĄCZENIE ostatecznej blokady klawiatury
         isAutoRenaming = true;
 
         rows.forEach((row) => {
@@ -425,7 +424,7 @@
             changesCount += 1;
         });
 
-        // Wyłączenie blokady klawiatury po zakończeniu ostatniej akcji w pętli
+        // WYŁĄCZENIE blokady po skończonej pracy
         window.setTimeout(() => {
             isAutoRenaming = false;
         }, delay + 500);
