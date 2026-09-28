@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.7
+// @version      4.8
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -23,10 +23,10 @@
     let cachedAnalysisArray = null;
     let isAutoRenaming = false; 
 
-    // OSTATECZNA BLOKADA KLAWIATURY NA TELEFONACH - Nadpisanie natywnej funkcji przeglądarki
+    // OSTATECZNA BLOKADA KLAWIATURY NA TELEFONACH
     const originalFocus = HTMLInputElement.prototype.focus;
     HTMLInputElement.prototype.focus = function() {
-        if (isAutoRenaming) return; // Jeśli automat działa, ignorujemy żądanie wysunięcia klawiatury
+        if (isAutoRenaming) return; 
         originalFocus.apply(this, arguments);
     };
 
@@ -38,25 +38,29 @@
 
     const css = `
         :root {
-            --tcm-bg-main: #36393f;
-            --tcm-bg-header: #202225;
-            --tcm-border: #3e4147;
-            --tcm-text: #ffffff;
+            --bg-main: #36393f;
+            --bg-row-alt: #32353b;
+            --bg-header: #202225;
+            --border-color: #3e4147;
+            --text-color: white;
+            --title-color: #ffffdf;
 
-            --tcm-btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, #000000 100%);
-            --tcm-btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
-            --tcm-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
-            --tcm-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
-            --tcm-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
-            --tcm-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
+            --btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, black 100%);
+            --btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
+            --btn-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
+            --btn-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
+            --btn-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
+            --btn-red-hover: linear-gradient(#bf6b6b 0%, #8c3838 30%, #732626 80%, #3d1414 100%);
+            --btn-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
+            --btn-blue-hover: linear-gradient(#6ba3bf 0%, #38738c 30%, #265473 80%, #142e3d 100%);
         }
 
         .tcm-btn {
             appearance: none;
-            border: 1px solid var(--tcm-border);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            background: var(--tcm-btn-bg);
-            color: var(--tcm-text);
+            background: var(--btn-bg);
+            color: var(--text-color);
             padding: 10px 15px;
             cursor: pointer;
             font-size: 14px;
@@ -67,14 +71,16 @@
         }
 
         .tcm-btn:hover {
-            background: var(--tcm-btn-hover);
+            background: var(--btn-hover);
             filter: brightness(1.15);
         }
 
-        .tcm-btn-green { background: var(--tcm-green-bg); }
-        .tcm-btn-green:hover { background: var(--tcm-green-hover); }
-        .tcm-btn-blue { background: var(--tcm-blue-bg); }
-        .tcm-btn-red { background: var(--tcm-red-bg); }
+        .tcm-btn-green { background: var(--btn-green-bg); }
+        .tcm-btn-green:hover { background: var(--btn-green-hover); }
+        .tcm-btn-blue { background: var(--btn-blue-bg); }
+        .tcm-btn-blue:hover { background: var(--btn-blue-hover); }
+        .tcm-btn-red { background: var(--btn-red-bg); }
+        .tcm-btn-red:hover { background: var(--btn-red-hover); }
 
         .tcm-floating-panel {
             position: fixed;
@@ -85,8 +91,8 @@
             flex-direction: column;
             gap: 8px;
             padding: 10px;
-            background: var(--tcm-bg-main);
-            border: 1px solid var(--tcm-border);
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
         }
@@ -268,8 +274,14 @@
     }
 
     function getIncomingCoordinates(row) {
-        // Nowa, bardziej niezawodna metoda: szukamy wszystkich koordynatów w tekście całego wiersza
-        const coords = Array.from((row.textContent || '').matchAll(/\b(\d{1,3}\|\d{1,3})\b/g)).map(m => m[1]);
+        // Zabezpieczenie przed "fałszywymi" koordynatami w etykietach ataków
+        const clone = row.cloneNode(true);
+        const quickedit = clone.querySelector('.quickedit');
+        if (quickedit) {
+            quickedit.remove(); // Usuwamy kontener z nazwą z kopii wiersza, by nie sczytać np. "11|7" z etykiety
+        }
+
+        const coords = Array.from((clone.textContent || '').matchAll(/\b(\d{1,3}\|\d{1,3})\b/g)).map(m => m[1]);
         let target = coords[0] || null;
         let origin = coords[1] || null;
         return { target, origin };
@@ -341,7 +353,6 @@
         const rows = getIncomingRows();
         
         rows.forEach((row) => {
-            // Celujemy w komórkę z nazwą ataku (quickedit), a nie tylko pierwszą (która bywa małym checkbocem)
             const labelCell = row.querySelector('.quickedit') ? row.querySelector('.quickedit').closest('td') : row.querySelector('td:nth-child(2)');
             if (!labelCell) return;
             
@@ -351,10 +362,8 @@
             const match = findAnalysis(analysisArray, target, origin);
 
             if (match && Array.isArray(match.c)) {
-                // Kolorujemy komórkę z nazwą
                 labelCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
                 
-                // Opcjonalnie: kolorujemy również komórkę obok (z czasem), dla lepszej widoczności
                 const nextCell = labelCell.nextElementSibling;
                 if (nextCell && nextCell.tagName === 'TD') {
                     nextCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
@@ -399,7 +408,6 @@
         let changesCount = 0;
         let alreadyLabeledCount = 0;
 
-        // WŁĄCZENIE ostatecznej blokady klawiatury
         isAutoRenaming = true;
 
         rows.forEach((row) => {
@@ -424,7 +432,6 @@
             changesCount += 1;
         });
 
-        // WYŁĄCZENIE blokady po skończonej pracy
         window.setTimeout(() => {
             isAutoRenaming = false;
         }, delay + 500);
