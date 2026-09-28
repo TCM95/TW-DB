@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.4
+// @version      4.5
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -20,7 +20,7 @@
     const isTWDatabase = /(^|\.)twdatabase\.online$/i.test(location.hostname);
     const isPlemiona = /(^|\.)plemiona\.pl$/i.test(location.hostname);
     
-    // CACHE - Pamięć podręczna, by nie katować procesora ciągłym odczytem GM_getValue
+    // CACHE - Pamięć podręczna dla MutationObservera
     let cachedAnalysisArray = null;
 
     /*
@@ -130,7 +130,7 @@
 
     function saveAnalysisData(data) {
         GM_setValue(STORAGE_KEY, JSON.stringify(data));
-        cachedAnalysisArray = data; // Aktualizacja pamięci podręcznej po zapisie
+        cachedAnalysisArray = data; // Aktualizacja pamięci po zapisie
     }
 
     function showButtonStatus(button, text, className, timeout = 4000) {
@@ -266,7 +266,6 @@
         let origin = getCoordinates(cells[2]);
 
         if (!target || !origin) {
-            // Zabezpieczenie przed błędem jeśli textContent zwróci null
             const coordinates = Array.from((row.textContent || '').matchAll(/\b\d{1,3}\|\d{1,3}\b/g)).map((match) => match[0]);
             target = target || coordinates[0] || null;
             origin = origin || coordinates[1] || null;
@@ -341,7 +340,6 @@
         const rows = getIncomingRows();
         
         rows.forEach((row) => {
-            // Ignorujemy już pokolorowane wiersze, oszczędzając zasoby procesora
             if (row.dataset.tcmColored) return;
             
             const { target, origin } = getIncomingCoordinates(row);
@@ -350,23 +348,52 @@
             if (match && Array.isArray(match.c)) {
                 const firstCell = row.querySelector(':scope > td');
                 if (firstCell) {
-                    firstCell.style.background = getBackgroundStyle(match.c);
+                    // DODANO: 'important', aby nadpisać sztywne klasy Plemion (.row_a, .row_b)
+                    firstCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
                 }
             }
             
-            // Oznaczamy wiersz jako przetworzony (nawet jeśli nie miał dopasowania)
             row.dataset.tcmColored = 'true';
         });
     }
 
-    function loadAnalysesToGame() {
-        const analysisArray = getCachedAnalysis();
+    function loadAnalysesToGame(btnElement) {
+        // Zawsze pobieraj najświeższe dane po kliknięciu na wypadek zmiany w innej karcie
+        const analysisArray = loadAnalysisData();
 
+        // LOGIKA DWUSTOPNIOWEGO PRZYCISKU
         if (!analysisArray.length) {
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB!', 3000, 'error');
+            // Jeśli przycisk jest już w trybie przekierowania (drugie kliknięcie)
+            if (btnElement && btnElement.dataset.redirectMode === 'true') {
+                GM_setValue('tcm_return_url', window.location.href);
+                window.location.href = 'https://twdatabase.online/command-analyzer/players/849206514';
+                return;
+            }
+
+            // Pierwsze kliknięcie, gdy brak danych - zmiana w przycisk nawigacyjny
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB! Kliknij ponownie, aby przejść do analizy.', 4000, 'error');
+            
+            if (btnElement) {
+                const originalHTML = btnElement.innerHTML;
+                btnElement.innerHTML = '➡️ Idź do TWDB';
+                btnElement.classList.remove('tcm-btn-blue');
+                btnElement.classList.add('tcm-btn-red');
+                btnElement.dataset.redirectMode = 'true';
+
+                // Reset przycisku po 5 sekundach
+                window.setTimeout(() => {
+                    if (btnElement.isConnected) {
+                        btnElement.innerHTML = originalHTML;
+                        btnElement.classList.remove('tcm-btn-red');
+                        btnElement.classList.add('tcm-btn-blue');
+                        btnElement.dataset.redirectMode = 'false';
+                    }
+                }, 5000);
+            }
             return;
         }
 
+        // Standardowa logika zmiany nazw
         const rows = getIncomingRows();
         let delay = 0;
         let changesCount = 0;
@@ -416,7 +443,6 @@
     function initPlemionaPanel() {
         if (!isPlemiona || !isIncomingPage()) return;
         
-        // Zabezpieczenie przed ponownym generowaniem przycisków
         if (document.querySelector('#tcm-twdb-nav-header')) return;
 
         const tableHeader = document.querySelector('#incomings_table tr th');
@@ -454,18 +480,16 @@
 
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            loadAnalysesToGame();
+            loadAnalysesToGame(button); // Przekazujemy referencję przycisku dla trybu przekierowania
         });
     }
 
     function initPlemiona() {
         if (!isPlemiona || !document.body) return;
 
-        // Inicjalizacja paneli i pierwsze pokolorowanie tabeli
         initPlemionaPanel();
         colorIncomingRows(getCachedAnalysis());
 
-        // Śledzenie zmian - teraz optymalne, z cache'owaniem
         const observer = new MutationObserver(() => {
             initPlemionaPanel();
             colorIncomingRows(getCachedAnalysis());
