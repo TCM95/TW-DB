@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.5
+// @version      4.6
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -20,8 +20,17 @@
     const isTWDatabase = /(^|\.)twdatabase\.online$/i.test(location.hostname);
     const isPlemiona = /(^|\.)plemiona\.pl$/i.test(location.hostname);
     
-    // CACHE - Pamięć podręczna dla MutationObservera
     let cachedAnalysisArray = null;
+    let isAutoRenaming = false; // Flaga blokująca klawiaturę na telefonach
+
+    // Przechwytywacz zapobiegający otwieraniu klawiatury podczas automatu
+    document.addEventListener('focusin', (e) => {
+        if (isAutoRenaming && e.target && e.target.tagName === 'INPUT') {
+            e.target.blur();
+            e.target.setAttribute('readonly', 'true'); // Wymuszenie fizycznej blokady
+            setTimeout(() => e.target.removeAttribute('readonly'), 50);
+        }
+    });
 
     /*
      * ============================
@@ -130,7 +139,7 @@
 
     function saveAnalysisData(data) {
         GM_setValue(STORAGE_KEY, JSON.stringify(data));
-        cachedAnalysisArray = data; // Aktualizacja pamięci po zapisie
+        cachedAnalysisArray = data; 
     }
 
     function showButtonStatus(button, text, className, timeout = 4000) {
@@ -340,37 +349,31 @@
         const rows = getIncomingRows();
         
         rows.forEach((row) => {
-            if (row.dataset.tcmColored) return;
+            const firstCell = row.querySelector(':scope > td');
+            if (!firstCell) return;
             
+            // Sprawdzenie "fizyczne" zamiast flagi tekstowej - odporne na dynamiczne odświeżanie czasu w grze
+            if (firstCell.style.getPropertyValue('background').includes('linear-gradient')) return;
+
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
             if (match && Array.isArray(match.c)) {
-                const firstCell = row.querySelector(':scope > td');
-                if (firstCell) {
-                    // DODANO: 'important', aby nadpisać sztywne klasy Plemion (.row_a, .row_b)
-                    firstCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
-                }
+                firstCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
             }
-            
-            row.dataset.tcmColored = 'true';
         });
     }
 
     function loadAnalysesToGame(btnElement) {
-        // Zawsze pobieraj najświeższe dane po kliknięciu na wypadek zmiany w innej karcie
         const analysisArray = loadAnalysisData();
 
-        // LOGIKA DWUSTOPNIOWEGO PRZYCISKU
         if (!analysisArray.length) {
-            // Jeśli przycisk jest już w trybie przekierowania (drugie kliknięcie)
             if (btnElement && btnElement.dataset.redirectMode === 'true') {
                 GM_setValue('tcm_return_url', window.location.href);
                 window.location.href = 'https://twdatabase.online/command-analyzer/players/849206514';
                 return;
             }
 
-            // Pierwsze kliknięcie, gdy brak danych - zmiana w przycisk nawigacyjny
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB! Kliknij ponownie, aby przejść do analizy.', 4000, 'error');
             
             if (btnElement) {
@@ -380,7 +383,6 @@
                 btnElement.classList.add('tcm-btn-red');
                 btnElement.dataset.redirectMode = 'true';
 
-                // Reset przycisku po 5 sekundach
                 window.setTimeout(() => {
                     if (btnElement.isConnected) {
                         btnElement.innerHTML = originalHTML;
@@ -393,11 +395,13 @@
             return;
         }
 
-        // Standardowa logika zmiany nazw
         const rows = getIncomingRows();
         let delay = 0;
         let changesCount = 0;
         let alreadyLabeledCount = 0;
+
+        // Włączenie blokady klawiatury dla urządzeń mobilnych przed startem pętli
+        isAutoRenaming = true;
 
         rows.forEach((row) => {
             const { target, origin } = getIncomingCoordinates(row);
@@ -420,6 +424,11 @@
             delay += 1300;
             changesCount += 1;
         });
+
+        // Wyłączenie blokady klawiatury po zakończeniu ostatniej akcji w pętli
+        window.setTimeout(() => {
+            isAutoRenaming = false;
+        }, delay + 500);
 
         if (changesCount > 0) {
             const message = `Rozpoczęto zmianę nazw. Liczba komend: ${changesCount}. Przewidywany czas: ${(changesCount * 1.3).toFixed(1)} s.`;
@@ -480,7 +489,7 @@
 
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            loadAnalysesToGame(button); // Przekazujemy referencję przycisku dla trybu przekierowania
+            loadAnalysesToGame(button); 
         });
     }
 
