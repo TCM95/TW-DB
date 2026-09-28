@@ -1,7 +1,7 @@
 [
   {
     "page": "screen=reqdef",
-    "label": "<a class=\"btn\" href=\"#\" style=\"margin-left:5px;\" onclick=\"try{var ta=document.getElementById('simple_message');if(!ta){UI.ErrorMessage('Nie znaleziono pola',2000);return false;}if(!window.twdA){var txt=ta.value||'';navigator.clipboard.writeText(txt).then(function(){UI.SuccessMessage('Skopiowano bez zmian! Kliknij ponownie, aby otworzyć bazę.',2500);window.twdA=true;}).catch(function(){UI.ErrorMessage('Błąd kopiowania API',2000);});}else{window.twdA=false;window.open('https://twdatabase.online/attacks','_blank','noopener,noreferrer');}return false;}catch(err){UI.ErrorMessage('Błąd: '+err.message,2500);return false;}\">🎯 Import</a>",
+    "label": "<a class=\"btn\" href=\"#\" style=\"margin-left:5px; transition: all 0.2s;\" onclick=\"try{var ta=document.getElementById('simple_message');if(!ta||!ta.value){UI.ErrorMessage('❗ Nie znaleziono danych',2000);return false;}if(!this.dataset.copied){var txt=ta.value;var btn=this;navigator.clipboard.writeText(txt).then(function(){UI.SuccessMessage('📋 Skopiowano! Kliknij ponownie.',2500);btn.dataset.copied='true';btn.innerHTML='✅ Otwórz Bazę';btn.style.setProperty('background','linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%)','important');}).catch(function(){UI.ErrorMessage('⚠️ Błąd',2000);});}else{this.dataset.copied='';this.innerHTML='📋 Eksportuj';this.style.background='';window.open('https://twdatabase.online/attacks','_blank','noopener,noreferrer');}return false;}catch(err){UI.ErrorMessage('❗ Błąd: '+err.message,2500);return false;}\">📋 Eksportuj</a>",
     "position": "form#reqdef_form td[colspan='3']",
     "method": "append"
   }
