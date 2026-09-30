@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.9
+// @version      5.0
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -84,7 +84,7 @@
 
         .tcm-floating-panel-top {
             position: fixed !important;
-            top: 10px !important;
+            top: 70px !important;
             right: 10px !important;
             z-index: 999999 !important;
             display: flex;
@@ -172,6 +172,8 @@
 
         rows.forEach((row) => {
             const cells = row.querySelectorAll(':scope > td');
+            if(cells.length < 9) return; // Zabezpieczenie przed pustymi wierszami
+            
             const target = getCoordinates(cells[1]);
             const origin = getCoordinates(cells[2]);
             const analysisCell = cells[8];
@@ -202,7 +204,7 @@
     }
 
     function initTWDatabasePanel() {
-        if (document.querySelector('#tcm-twdb-panel')) return;
+        if (document.getElementById('tcm-twdb-panel')) return true;
 
         const panel = document.createElement('div');
         panel.id = 'tcm-twdb-panel';
@@ -235,13 +237,22 @@
                 }, 800);
             }
         });
+        return true;
     }
 
     function initTWDatabase() {
-        if (!isTWDatabase || !document.body) return;
-        initTWDatabasePanel();
-        const observer = new MutationObserver(() => initTWDatabasePanel());
-        observer.observe(document.body, { childList: true, subtree: true });
+        if (!isTWDatabase) return;
+        
+        // Zastąpiono morderczy MutationObserver lekkim interwałem sprawdzającym co 1.5 sekundy
+        const twdbInterval = setInterval(() => {
+            if (document.body) {
+                initTWDatabasePanel();
+                // Jeśli znajdziemy tabelę z analizami, możemy zatrzymać interwał (wczytanie zakończone)
+                if (document.querySelector('table.ap-table')) {
+                    clearInterval(twdbInterval);
+                }
+            }
+        }, 1500);
     }
 
     /*
@@ -484,7 +495,7 @@
         button.id = 'tcm-twdb-btn-header';
         button.type = 'button';
         button.className = 'tcm-btn tcm-btn-blue';
-        button.innerHTML = '⚙️ Wczytaj';
+        button.innerHTML = '⚙️️ Wczytaj';
         button.style.padding = '2px 8px';
         button.style.marginLeft = '5px';
         button.style.fontSize = '11px';
