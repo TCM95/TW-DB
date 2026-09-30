@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      5.1
-// @description  Ultraszybkie masowe otwieranie i zatwierdzanie nazw ataków z opóźnieniem 80-190ms
+// @version      5.2
+// @description  Błyskawiczne masowe otwieranie i równoległe zatwierdzanie nazw ataków (okienko 80-190ms)
 // @author       TCM
 // @match        *://*.twdatabase.online/*
 // @match        https://*.plemiona.pl/game.php*
@@ -353,11 +353,11 @@
         const itemsToProcess = [];
         let alreadyLabeledCount = 0;
 
-        // Blokujemy focus, żeby nie wyskoczyła klawiatura
+        // Tymczasowe zablokowanie focus, aby klawiatura w telefonie nie szalała
         const originalFocus = HTMLElement.prototype.focus;
         HTMLElement.prototype.focus = function() {};
 
-        // KROK 1: Wyznaczenie wierszy do zmiany
+        // 1. Zbieramy tylko te wiersze, które wymagają edycji
         rows.forEach((row) => {
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
@@ -388,12 +388,12 @@
             return;
         }
 
-        // KROK 2: Otwieramy WSZYSTKIE kontenery edycji na raz
+        // 2. OTWIERAMY WSZYSTKO NA RAZ (bezzwłocznie)
         itemsToProcess.forEach(item => {
             item.renameBtn.click();
         });
 
-        // KROK 3: Po ułamku sekundy wstrzykujemy wartości do otwartych inputów i sekwencyjnie klikamy Zapisz (80-190ms)
+        // 3. Po 50ms wstrzykujemy wszystkie wartości i uruchamiamy ZAPIS RÓWNOLEGŁY
         setTimeout(() => {
             itemsToProcess.forEach(item => {
                 const input = findRenameInput(item.row);
@@ -403,15 +403,12 @@
                 }
             });
 
-            // Odblokowujemy focus
+            // Przywracamy domyślne zachowanie focus
             HTMLElement.prototype.focus = originalFocus;
 
-            // KROK 4: Błyskawiczne, masowe zatwierdzanie z losowym czasem 80-190 ms
-            let totalDelay = 0;
-            itemsToProcess.forEach((item, index) => {
-                const currentDelay = getRandomDelay(80, 190);
-                totalDelay += currentDelay;
-
+            // Zapis następuje dla każdego elementu w losowym czasie (80-190ms) startując OD TEGO MOMENTU.
+            // Bez zsumowanego opóźnienia – wszystko zapisze się w ułamku sekundy.
+            itemsToProcess.forEach((item) => {
                 setTimeout(() => {
                     const saveBtn = findRenameSaveButton(item.row);
                     const input = findRenameInput(item.row);
@@ -421,20 +418,14 @@
                     } else if (input) {
                         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                     }
-
-                    if (index === itemsToProcess.length - 1) {
-                        if (typeof UI !== 'undefined' && UI.InfoMessage) {
-                            UI.InfoMessage(`Zakończono masową zmianę ${itemsToProcess.length} nazw!`, 3000, 'success');
-                        }
-                    }
-                }, totalDelay);
+                }, getRandomDelay(80, 190));
             });
 
-        }, 50);
+            if (typeof UI !== 'undefined' && UI.InfoMessage) {
+                UI.InfoMessage(`Przetworzono ${itemsToProcess.length} nazw!`, 3000, 'success');
+            }
 
-        if (typeof UI !== 'undefined' && UI.InfoMessage) {
-            UI.InfoMessage(`Otwarto ${itemsToProcess.length} kontenerów. Rozpoczynam błyskawiczny zapis...`, 3000, 'info');
-        }
+        }, 50);
     }
 
     function isIncomingPage() {
@@ -460,7 +451,7 @@
         navButton.id = 'tcm-twdb-nav-header';
         navButton.type = 'button';
         navButton.className = 'tcm-btn tcm-btn-green';
-        navButton.innerHTML = '➡️️ TWDB';
+        navButton.innerHTML = '➡ TWDB';
         navButton.style.padding = '2px 8px';
         navButton.style.marginLeft = '10px';
         navButton.style.fontSize = '11px';
