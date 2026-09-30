@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      5.0
+// @version      5.1
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -32,7 +32,7 @@
 
     /*
      * ============================
-     * WSPÓLNE FUNKCJE
+     * WSPÓLNE FUNKCJE I CSS
      * ============================
      */
 
@@ -162,17 +162,18 @@
 
     /*
      * ============================
-     * TW DATABASE
+     * TW DATABASE (STRONA Z ANALIZĄ)
      * ============================
      */
 
+    // Skanuje tabelę DOPIERO PO KLIKNIĘCIU w przycisk
     function collectTWDatabaseAnalyses() {
         const result = [];
         const rows = document.querySelectorAll('table.ap-table tbody tr');
 
         rows.forEach((row) => {
             const cells = row.querySelectorAll(':scope > td');
-            if(cells.length < 9) return; // Zabezpieczenie przed pustymi wierszami
+            if (cells.length < 9) return;
             
             const target = getCoordinates(cells[1]);
             const origin = getCoordinates(cells[2]);
@@ -203,8 +204,10 @@
         return result;
     }
 
-    function initTWDatabasePanel() {
-        if (document.getElementById('tcm-twdb-panel')) return true;
+    // Wstawia przycisk OD RAZU, bez żadnych warunków i pętli
+    function initTWDatabase() {
+        if (!isTWDatabase) return;
+        if (document.getElementById('tcm-twdb-panel')) return;
 
         const panel = document.createElement('div');
         panel.id = 'tcm-twdb-panel';
@@ -223,7 +226,7 @@
             const data = collectTWDatabaseAnalyses();
 
             if (!data.length) {
-                showButtonStatus(button, '❌ Brak analiz', 'tcm-btn-red');
+                showButtonStatus(button, '❌ Tabela pusta / ładowanie...', 'tcm-btn-red');
                 return;
             }
 
@@ -237,22 +240,6 @@
                 }, 800);
             }
         });
-        return true;
-    }
-
-    function initTWDatabase() {
-        if (!isTWDatabase) return;
-        
-        // Zastąpiono morderczy MutationObserver lekkim interwałem sprawdzającym co 1.5 sekundy
-        const twdbInterval = setInterval(() => {
-            if (document.body) {
-                initTWDatabasePanel();
-                // Jeśli znajdziemy tabelę z analizami, możemy zatrzymać interwał (wczytanie zakończone)
-                if (document.querySelector('table.ap-table')) {
-                    clearInterval(twdbInterval);
-                }
-            }
-        }, 1500);
     }
 
     /*
@@ -495,7 +482,7 @@
         button.id = 'tcm-twdb-btn-header';
         button.type = 'button';
         button.className = 'tcm-btn tcm-btn-blue';
-        button.innerHTML = '⚙️️ Wczytaj';
+        button.innerHTML = '⚙ Wczytaj';
         button.style.padding = '2px 8px';
         button.style.marginLeft = '5px';
         button.style.fontSize = '11px';
