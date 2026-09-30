@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      5.0
-// @description  Szybkie, zbiorcze i bezinwazyjne aktualizowanie nazw ataków na podstawie analiz TW Database
+// @version      5.1
+// @description  Ultraszybkie masowe otwieranie i zatwierdzanie nazw ataków z opóźnieniem 80-190ms
 // @author       TCM
 // @match        *://*.twdatabase.online/*
 // @match        https://*.plemiona.pl/game.php*
@@ -279,8 +279,20 @@
         return { target, origin };
     }
 
+    function findRenameButton(row) {
+        return row.querySelector('.rename-icon, .quickedit-label ~ a, [class*="rename"], [data-action="rename"], a[href*="rename"]');
+    }
+
     function findLabelElement(row) {
         return row.querySelector('.quickedit-label, .command-label, [class*="label"]');
+    }
+
+    function findRenameInput(row) {
+        return row.querySelector('input[type="text"], input.quickedit-edit, input[name*="label"], input[name*="name"]');
+    }
+
+    function findRenameSaveButton(row) {
+        return row.querySelector('input[type="button"], button[type="submit"], button, .quickedit-save');
     }
 
     function getCurrentLabel(row) {
@@ -291,6 +303,22 @@
     function buildNewLabel(currentLabel, analysisTag) {
         const cleanLabel = (currentLabel || '').replace(/\[[^\]]*]/g, '').replace(/\s+/g, ' ').trim();
         return cleanLabel ? `${cleanLabel} ${analysisTag}` : analysisTag;
+    }
+
+    function setNativeInputValue(input, value) {
+        const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        if (descriptor && descriptor.set) {
+            descriptor.set.call(input, value);
+        } else {
+            input.value = value;
+        }
+        ['input', 'change'].forEach(eventType => {
+            input.dispatchEvent(new Event(eventType, { bubbles: true }));
+        });
+    }
+
+    function getRandomDelay(min = 80, max = 190) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function colorIncomingRows(analysisArray) {
@@ -313,48 +341,6 @@
         });
     }
 
-    function batchRenameCommands(updates) {
-        const form = document.querySelector('#incomings_form');
-        if (!form) return;
-
-        const formData = new FormData(form);
-
-        updates.forEach(update => {
-            formData.set(`id_${update.id}`, update.label);
-        });
-
-        const actionUrl = form.getAttribute('action') || window.location.href;
-
-        fetch(actionUrl, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        }).then(() => {
-            updates.forEach(update => {
-                const labelElement = findLabelElement(update.row);
-                if (labelElement) {
-                    const link = labelElement.querySelector('a');
-                    if (link) {
-                        link.textContent = update.label;
-                    } else {
-                        labelElement.textContent = update.label;
-                    }
-                }
-            });
-
-            if (typeof UI !== 'undefined' && UI.InfoMessage) {
-                UI.InfoMessage(`Pomyślnie zaktualizowano ${updates.length} rozkazów!`, 3000, 'success');
-            }
-        }).catch(err => {
-            console.error('[TWDB] Błąd podczas zapisywania zmian:', err);
-            if (typeof UI !== 'undefined' && UI.InfoMessage) {
-                UI.InfoMessage('Wystąpił błąd podczas masowej zmiany nazw.', 4000, 'error');
-            }
-        });
-    }
-
     function loadAnalysesToGame() {
         const analysisArray = loadAnalysisData();
 
@@ -364,9 +350,14 @@
         }
 
         const rows = getIncomingRows();
-        const updates = [];
+        const itemsToProcess = [];
         let alreadyLabeledCount = 0;
 
+        // Blokujemy focus, żeby nie wyskoczyła klawiatura
+        const originalFocus = HTMLElement.prototype.focus;
+        HTMLElement.prototype.focus = function() {};
+
+        // KROK 1: Wyznaczenie wierszy do zmiany
         rows.forEach((row) => {
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
@@ -381,24 +372,68 @@
                 return;
             }
 
-            const checkbox = row.querySelector('input[name="command_ids[]"], input[type="checkbox"][value]');
-            if (!checkbox) return;
-
-            const commandId = checkbox.value;
-
-            updates.push({
-                id: commandId,
-                label: newLabel,
-                row: row
-            });
+            const renameBtn = findRenameButton(row);
+            if (renameBtn) {
+                itemsToProcess.push({ row, newLabel, renameBtn });
+            }
         });
 
-        if (updates.length > 0) {
-            batchRenameCommands(updates);
-        } else if (alreadyLabeledCount > 0) {
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(`Wszystkie pasujące komendy (${alreadyLabeledCount}) są aktualne.`, 4000, 'success');
-        } else {
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono komend pasujących do analiz.', 4000, 'error');
+        if (!itemsToProcess.length) {
+            HTMLElement.prototype.focus = originalFocus;
+            if (alreadyLabeledCount > 0) {
+                if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(`Wszystkie pasujące komendy (${alreadyLabeledCount}) są aktualne.`, 4000, 'success');
+            } else {
+                if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono komend pasujących do analiz.', 4000, 'error');
+            }
+            return;
+        }
+
+        // KROK 2: Otwieramy WSZYSTKIE kontenery edycji na raz
+        itemsToProcess.forEach(item => {
+            item.renameBtn.click();
+        });
+
+        // KROK 3: Po ułamku sekundy wstrzykujemy wartości do otwartych inputów i sekwencyjnie klikamy Zapisz (80-190ms)
+        setTimeout(() => {
+            itemsToProcess.forEach(item => {
+                const input = findRenameInput(item.row);
+                if (input) {
+                    input.setAttribute('inputmode', 'none');
+                    setNativeInputValue(input, item.newLabel);
+                }
+            });
+
+            // Odblokowujemy focus
+            HTMLElement.prototype.focus = originalFocus;
+
+            // KROK 4: Błyskawiczne, masowe zatwierdzanie z losowym czasem 80-190 ms
+            let totalDelay = 0;
+            itemsToProcess.forEach((item, index) => {
+                const currentDelay = getRandomDelay(80, 190);
+                totalDelay += currentDelay;
+
+                setTimeout(() => {
+                    const saveBtn = findRenameSaveButton(item.row);
+                    const input = findRenameInput(item.row);
+
+                    if (saveBtn && saveBtn !== item.renameBtn) {
+                        saveBtn.click();
+                    } else if (input) {
+                        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                    }
+
+                    if (index === itemsToProcess.length - 1) {
+                        if (typeof UI !== 'undefined' && UI.InfoMessage) {
+                            UI.InfoMessage(`Zakończono masową zmianę ${itemsToProcess.length} nazw!`, 3000, 'success');
+                        }
+                    }
+                }, totalDelay);
+            });
+
+        }, 50);
+
+        if (typeof UI !== 'undefined' && UI.InfoMessage) {
+            UI.InfoMessage(`Otwarto ${itemsToProcess.length} kontenerów. Rozpoczynam błyskawiczny zapis...`, 3000, 'info');
         }
     }
 
@@ -425,7 +460,7 @@
         navButton.id = 'tcm-twdb-nav-header';
         navButton.type = 'button';
         navButton.className = 'tcm-btn tcm-btn-green';
-        navButton.innerHTML = '➡️ TWDB';
+        navButton.innerHTML = '➡️️ TWDB';
         navButton.style.padding = '2px 8px';
         navButton.style.marginLeft = '10px';
         navButton.style.fontSize = '11px';
