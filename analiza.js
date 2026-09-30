@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      5.1
+// @version      4.5
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -19,48 +19,34 @@
 
     const isTWDatabase = /(^|\.)twdatabase\.online$/i.test(location.hostname);
     const isPlemiona = /(^|\.)plemiona\.pl$/i.test(location.hostname);
-    
-    let cachedAnalysisArray = null;
-    let isAutoRenaming = false; 
-
-    // OSTATECZNA BLOKADA KLAWIATURY NA TELEFONACH
-    const originalFocus = HTMLInputElement.prototype.focus;
-    HTMLInputElement.prototype.focus = function() {
-        if (isAutoRenaming) return; 
-        originalFocus.apply(this, arguments);
-    };
 
     /*
      * ============================
-     * WSPÓLNE FUNKCJE I CSS
+     * WSPÓLNE FUNKCJE
      * ============================
      */
 
     const css = `
         :root {
-            --bg-main: #36393f;
-            --bg-row-alt: #32353b;
-            --bg-header: #202225;
-            --border-color: #3e4147;
-            --text-color: white;
-            --title-color: #ffffdf;
+            --tcm-bg-main: #36393f;
+            --tcm-bg-header: #202225;
+            --tcm-border: #3e4147;
+            --tcm-text: #ffffff;
 
-            --btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, black 100%);
-            --btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
-            --btn-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
-            --btn-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
-            --btn-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
-            --btn-red-hover: linear-gradient(#bf6b6b 0%, #8c3838 30%, #732626 80%, #3d1414 100%);
-            --btn-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
-            --btn-blue-hover: linear-gradient(#6ba3bf 0%, #38738c 30%, #265473 80%, #142e3d 100%);
+            --tcm-btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, #000000 100%);
+            --tcm-btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
+            --tcm-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
+            --tcm-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
+            --tcm-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
+            --tcm-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
         }
 
         .tcm-btn {
             appearance: none;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--tcm-border);
             border-radius: 4px;
-            background: var(--btn-bg);
-            color: var(--text-color);
+            background: var(--tcm-btn-bg);
+            color: var(--tcm-text);
             padding: 10px 15px;
             cursor: pointer;
             font-size: 14px;
@@ -71,28 +57,27 @@
         }
 
         .tcm-btn:hover {
-            background: var(--btn-hover);
+            background: var(--tcm-btn-hover);
             filter: brightness(1.15);
         }
 
-        .tcm-btn-green { background: var(--btn-green-bg); }
-        .tcm-btn-green:hover { background: var(--btn-green-hover); }
-        .tcm-btn-blue { background: var(--btn-blue-bg); }
-        .tcm-btn-blue:hover { background: var(--btn-blue-hover); }
-        .tcm-btn-red { background: var(--btn-red-bg); }
-        .tcm-btn-red:hover { background: var(--btn-red-hover); }
+        .tcm-btn-green { background: var(--tcm-green-bg); }
+        .tcm-btn-green:hover { background: var(--tcm-green-hover); }
+        .tcm-btn-blue { background: var(--tcm-blue-bg); }
+        .tcm-btn-red { background: var(--tcm-red-bg); }
 
-        .tcm-floating-panel-top {
+        .tcm-floating-panel {
             position: fixed !important;
-            top: 70px !important;
             right: 10px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
             z-index: 999999 !important;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 8px;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
+            padding: 10px;
+            background: var(--tcm-bg-main);
+            border: 1px solid var(--tcm-border);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
         }
@@ -136,18 +121,12 @@
         }
     }
 
-    function getCachedAnalysis() {
-        if (!cachedAnalysisArray) cachedAnalysisArray = loadAnalysisData();
-        return cachedAnalysisArray;
-    }
-
     function saveAnalysisData(data) {
         GM_setValue(STORAGE_KEY, JSON.stringify(data));
-        cachedAnalysisArray = data; 
     }
 
     function showButtonStatus(button, text, className, timeout = 4000) {
-        const originalText = button.dataset.originalText || '💾 Zapisz analizy do gry';
+        const originalText = button.dataset.originalText || 'Zapisz analizy';
         button.textContent = text;
         button.classList.remove('tcm-btn-green', 'tcm-btn-blue', 'tcm-btn-red');
         if (className) button.classList.add(className);
@@ -162,19 +141,20 @@
 
     /*
      * ============================
-     * TW DATABASE (STRONA Z ANALIZĄ)
+     * TW DATABASE
      * ============================
      */
 
-    // Skanuje tabelę DOPIERO PO KLIKNIĘCIU w przycisk
     function collectTWDatabaseAnalyses() {
         const result = [];
-        const rows = document.querySelectorAll('table.ap-table tbody tr');
+        // Złagodzony selektor, aby ignorować zmianę ewentualnych klas na tabeli w TWDB
+        const rows = document.querySelectorAll('table tbody tr');
 
         rows.forEach((row) => {
             const cells = row.querySelectorAll(':scope > td');
-            if (cells.length < 9) return;
-            
+            // Zabezpieczenie na wypadek mniejszej liczby kolumn w innych tabelach
+            if (cells.length < 9) return; 
+
             const target = getCoordinates(cells[1]);
             const origin = getCoordinates(cells[2]);
             const analysisCell = cells[8];
@@ -204,14 +184,13 @@
         return result;
     }
 
-    // Wstawia przycisk OD RAZU, bez żadnych warunków i pętli
-    function initTWDatabase() {
-        if (!isTWDatabase) return;
-        if (document.getElementById('tcm-twdb-panel')) return;
+    function initTWDatabasePanel() {
+        // Zamiast szukać tabeli, sprawdzamy czy to w ogóle podstrona analizatora
+        if (document.querySelector('#tcm-twdb-panel') || !location.href.includes('command-analyzer')) return;
 
         const panel = document.createElement('div');
         panel.id = 'tcm-twdb-panel';
-        panel.className = 'tcm-floating-panel-top';
+        panel.className = 'tcm-floating-panel';
 
         const button = document.createElement('button');
         button.type = 'button';
@@ -220,18 +199,18 @@
         button.dataset.originalText = '💾 Zapisz analizy do gry';
 
         panel.appendChild(button);
-        (document.body || document.documentElement).appendChild(panel);
+        document.body.appendChild(panel);
 
         button.addEventListener('click', () => {
             const data = collectTWDatabaseAnalyses();
 
             if (!data.length) {
-                showButtonStatus(button, '❌ Tabela pusta / ładowanie...', 'tcm-btn-red');
+                showButtonStatus(button, 'Brak analiz', 'tcm-btn-red');
                 return;
             }
 
             saveAnalysisData(data);
-            showButtonStatus(button, `💾 Zapisano: ${data.length}`, 'tcm-btn-blue');
+            showButtonStatus(button, `Zapisano: ${data.length}`, 'tcm-btn-blue');
 
             const returnUrl = GM_getValue('tcm_return_url');
             if (returnUrl) {
@@ -240,6 +219,15 @@
                 }, 800);
             }
         });
+    }
+
+    function initTWDatabase() {
+        if (!isTWDatabase || !document.body) return;
+
+        initTWDatabasePanel();
+
+        const observer = new MutationObserver(() => initTWDatabasePanel());
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     /*
@@ -268,19 +256,20 @@
     }
 
     function getIncomingRows() {
-        return Array.from(document.querySelectorAll('#incomings_table tr.nowrap, #incomings_table tbody tr, table#incomings_table tr')).filter(row => row.querySelector('td'));
+        return Array.from(document.querySelectorAll('#incomings_table tr.nowrap, #incomings_table tbody tr, table#incomings_table tr'));
     }
 
     function getIncomingCoordinates(row) {
-        const clone = row.cloneNode(true);
-        const quickedit = clone.querySelector('.quickedit');
-        if (quickedit) {
-            quickedit.remove();
+        const cells = Array.from(row.querySelectorAll(':scope > td'));
+        let target = getCoordinates(cells[1]);
+        let origin = getCoordinates(cells[2]);
+
+        if (!target || !origin) {
+            const coordinates = Array.from(row.textContent.matchAll(/\b\d{1,3}\|\d{1,3}\b/g)).map((match) => match[0]);
+            target = target || coordinates[0] || null;
+            origin = origin || coordinates[1] || null;
         }
 
-        const coords = Array.from((clone.textContent || '').matchAll(/\b(\d{1,3}\|\d{1,3})\b/g)).map(m => m[1]);
-        let target = coords[0] || null;
-        let origin = coords[1] || null;
         return { target, origin };
     }
 
@@ -346,57 +335,25 @@
     }
 
     function colorIncomingRows(analysisArray) {
-        if (!analysisArray || !analysisArray.length) return;
         const rows = getIncomingRows();
-        
         rows.forEach((row) => {
-            const labelCell = row.querySelector('.quickedit') ? row.querySelector('.quickedit').closest('td') : row.querySelector('td:nth-child(2)');
-            if (!labelCell) return;
-            
-            if (labelCell.style.getPropertyValue('background').includes('linear-gradient')) return;
-
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
-            if (match && Array.isArray(match.c)) {
-                labelCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
-                
-                const nextCell = labelCell.nextElementSibling;
-                if (nextCell && nextCell.tagName === 'TD') {
-                    nextCell.style.setProperty('background', getBackgroundStyle(match.c), 'important');
-                }
+            if (!match || !Array.isArray(match.c)) return;
+
+            const firstCell = row.querySelector(':scope > td');
+            if (firstCell) {
+                firstCell.style.background = getBackgroundStyle(match.c);
             }
         });
     }
 
-    function loadAnalysesToGame(btnElement) {
+    function loadAnalysesToGame() {
         const analysisArray = loadAnalysisData();
 
         if (!analysisArray.length) {
-            if (btnElement && btnElement.dataset.redirectMode === 'true') {
-                GM_setValue('tcm_return_url', window.location.href);
-                window.location.href = 'https://twdatabase.online/command-analyzer/players/849206514';
-                return;
-            }
-
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB! Kliknij ponownie, aby przejść do analizy.', 4000, 'error');
-            
-            if (btnElement) {
-                const originalHTML = btnElement.innerHTML;
-                btnElement.innerHTML = '➡️ Idź do TWDB';
-                btnElement.classList.remove('tcm-btn-blue');
-                btnElement.classList.add('tcm-btn-red');
-                btnElement.dataset.redirectMode = 'true';
-
-                window.setTimeout(() => {
-                    if (btnElement.isConnected) {
-                        btnElement.innerHTML = originalHTML;
-                        btnElement.classList.remove('tcm-btn-red');
-                        btnElement.classList.add('tcm-btn-blue');
-                        btnElement.dataset.redirectMode = 'false';
-                    }
-                }, 5000);
-            }
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB!', 3000, 'error');
             return;
         }
 
@@ -404,8 +361,6 @@
         let delay = 0;
         let changesCount = 0;
         let alreadyLabeledCount = 0;
-
-        isAutoRenaming = true;
 
         rows.forEach((row) => {
             const { target, origin } = getIncomingCoordinates(row);
@@ -429,10 +384,6 @@
             changesCount += 1;
         });
 
-        window.setTimeout(() => {
-            isAutoRenaming = false;
-        }, delay + 500);
-
         if (changesCount > 0) {
             const message = `Rozpoczęto zmianę nazw. Liczba komend: ${changesCount}. Przewidywany czas: ${(changesCount * 1.3).toFixed(1)} s.`;
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 5000, 'success');
@@ -454,8 +405,11 @@
 
     function initPlemionaPanel() {
         if (!isPlemiona || !isIncomingPage()) return;
-        
-        if (document.querySelector('#tcm-twdb-nav-header')) return;
+
+        if (document.querySelector('#tcm-twdb-nav-header')) {
+            colorIncomingRows(loadAnalysisData());
+            return;
+        }
 
         const tableHeader = document.querySelector('#incomings_table tr th');
         if (!tableHeader) return;
@@ -482,7 +436,7 @@
         button.id = 'tcm-twdb-btn-header';
         button.type = 'button';
         button.className = 'tcm-btn tcm-btn-blue';
-        button.innerHTML = '⚙ Wczytaj';
+        button.innerHTML = '⚙️ Wczytaj';
         button.style.padding = '2px 8px';
         button.style.marginLeft = '5px';
         button.style.fontSize = '11px';
@@ -490,9 +444,11 @@
 
         tableHeader.appendChild(button);
 
+        colorIncomingRows(loadAnalysisData());
+
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            loadAnalysesToGame(button); 
+            loadAnalysesToGame();
         });
     }
 
@@ -500,11 +456,10 @@
         if (!isPlemiona || !document.body) return;
 
         initPlemionaPanel();
-        colorIncomingRows(getCachedAnalysis());
 
         const observer = new MutationObserver(() => {
             initPlemionaPanel();
-            colorIncomingRows(getCachedAnalysis());
+            colorIncomingRows(loadAnalysisData());
         });
 
         observer.observe(document.body, { childList: true, subtree: true });
