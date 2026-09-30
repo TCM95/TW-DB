@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.8
-// @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
+// @version      5.0
+// @description  Szybkie, zbiorcze i bezinwazyjne aktualizowanie nazw ataków na podstawie analiz TW Database
 // @author       TCM
 // @match        *://*.twdatabase.online/*
 // @match        https://*.plemiona.pl/game.php*
@@ -279,20 +279,8 @@
         return { target, origin };
     }
 
-    function findRenameButton(row) {
-        return row.querySelector('.rename-icon, .quickedit-label ~ a, [class*="rename"], [data-action="rename"], a[href*="rename"]');
-    }
-
     function findLabelElement(row) {
         return row.querySelector('.quickedit-label, .command-label, [class*="label"]');
-    }
-
-    function findRenameInput(row) {
-        return row.querySelector('input[type="text"], input.quickedit-edit, input[name*="label"], input[name*="name"]');
-    }
-
-    function findRenameSaveButton(row) {
-        return row.querySelector('input[type="button"], button[type="submit"], button, .quickedit-save');
     }
 
     function getCurrentLabel(row) {
@@ -303,56 +291,6 @@
     function buildNewLabel(currentLabel, analysisTag) {
         const cleanLabel = (currentLabel || '').replace(/\[[^\]]*]/g, '').replace(/\s+/g, ' ').trim();
         return cleanLabel ? `${cleanLabel} ${analysisTag}` : analysisTag;
-    }
-
-    function setNativeInputValue(input, value) {
-        const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
-        if (descriptor && descriptor.set) {
-            descriptor.set.call(input, value);
-        } else {
-            input.value = value;
-        }
-        // Pozostawiono tylko niezbędne eventy. Usunięto 'keyup', by nie aktywować dodatkowych akcji z gry.
-        ['input', 'change'].forEach(eventType => {
-            input.dispatchEvent(new Event(eventType, { bubbles: true }));
-        });
-    }
-
-    function renameIncomingCommand(row, newLabel) {
-        const renameButton = findRenameButton(row);
-        if (!renameButton) return false;
-
-        // Tymczasowe zablokowanie focus(), aby powstrzymać klawiaturę mobilną
-        const originalFocus = HTMLElement.prototype.focus;
-        HTMLElement.prototype.focus = function() {}; 
-
-        renameButton.click();
-
-        window.setTimeout(() => {
-            const input = findRenameInput(row);
-            if (!input) {
-                HTMLElement.prototype.focus = originalFocus;
-                return;
-            }
-
-            // Atrybut inputmode wymusza brak klawiatury sprzętowej / wirtualnej
-            input.setAttribute('inputmode', 'none');
-
-            setNativeInputValue(input, newLabel);
-            const saveButton = findRenameSaveButton(row);
-
-            if (saveButton && saveButton !== renameButton) {
-                saveButton.click();
-            } else {
-                input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-            }
-
-            // Przywracamy domyślne zachowanie na ułamek sekundy po wykonaniu zadania
-            setTimeout(() => {
-                HTMLElement.prototype.focus = originalFocus;
-            }, 50);
-
-        }, 30); // Zmniejszono z 250ms na 30ms (input ładuje się błyskawicznie)
     }
 
     function colorIncomingRows(analysisArray) {
@@ -375,6 +313,48 @@
         });
     }
 
+    function batchRenameCommands(updates) {
+        const form = document.querySelector('#incomings_form');
+        if (!form) return;
+
+        const formData = new FormData(form);
+
+        updates.forEach(update => {
+            formData.set(`id_${update.id}`, update.label);
+        });
+
+        const actionUrl = form.getAttribute('action') || window.location.href;
+
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(() => {
+            updates.forEach(update => {
+                const labelElement = findLabelElement(update.row);
+                if (labelElement) {
+                    const link = labelElement.querySelector('a');
+                    if (link) {
+                        link.textContent = update.label;
+                    } else {
+                        labelElement.textContent = update.label;
+                    }
+                }
+            });
+
+            if (typeof UI !== 'undefined' && UI.InfoMessage) {
+                UI.InfoMessage(`Pomyślnie zaktualizowano ${updates.length} rozkazów!`, 3000, 'success');
+            }
+        }).catch(err => {
+            console.error('[TWDB] Błąd podczas zapisywania zmian:', err);
+            if (typeof UI !== 'undefined' && UI.InfoMessage) {
+                UI.InfoMessage('Wystąpił błąd podczas masowej zmiany nazw.', 4000, 'error');
+            }
+        });
+    }
+
     function loadAnalysesToGame() {
         const analysisArray = loadAnalysisData();
 
@@ -384,8 +364,7 @@
         }
 
         const rows = getIncomingRows();
-        let delay = 0;
-        let changesCount = 0;
+        const updates = [];
         let alreadyLabeledCount = 0;
 
         rows.forEach((row) => {
@@ -396,28 +375,28 @@
 
             const currentLabel = getCurrentLabel(row);
             const newLabel = buildNewLabel(currentLabel, match.a);
-            
+
             if (currentLabel === newLabel) {
-                alreadyLabeledCount++; 
+                alreadyLabeledCount++;
                 return;
             }
 
-            window.setTimeout(() => {
-                renameIncomingCommand(row, newLabel);
-            }, delay);
+            const checkbox = row.querySelector('input[name="command_ids[]"], input[type="checkbox"][value]');
+            if (!checkbox) return;
 
-            // 1050ms – minimalny bezpieczny limit (zgodnie z ograniczeniami regulaminu 1 żądanie/sek).
-            // Dzięki poprawkom wyżej, UI nie będzie już przycinać w trakcie tego oczekiwania.
-            delay += 1050; 
-            changesCount += 1;
+            const commandId = checkbox.value;
+
+            updates.push({
+                id: commandId,
+                label: newLabel,
+                row: row
+            });
         });
 
-        if (changesCount > 0) {
-            const message = `Rozpoczęto bezinwazyjną zmianę nazw. Liczba komend: ${changesCount}. Przewidywany czas: ${(changesCount * 1.05).toFixed(1)} s.`;
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 5000, 'success');
+        if (updates.length > 0) {
+            batchRenameCommands(updates);
         } else if (alreadyLabeledCount > 0) {
-            const message = `Wszystkie pasujące komendy (${alreadyLabeledCount}) są już aktualne.`;
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 4000, 'success');
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(`Wszystkie pasujące komendy (${alreadyLabeledCount}) są aktualne.`, 4000, 'success');
         } else {
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono komend pasujących do analiz.', 4000, 'error');
         }
