@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.8
+// @version      4.9
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -82,15 +82,15 @@
         .tcm-btn-red { background: var(--btn-red-bg); }
         .tcm-btn-red:hover { background: var(--btn-red-hover); }
 
-        .tcm-floating-panel {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            z-index: 999999;
+        .tcm-floating-panel-top {
+            position: fixed !important;
+            top: 10px !important;
+            right: 10px !important;
+            z-index: 999999 !important;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 10px;
+            padding: 8px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -147,7 +147,7 @@
     }
 
     function showButtonStatus(button, text, className, timeout = 4000) {
-        const originalText = button.dataset.originalText || 'Zapisz analizy';
+        const originalText = button.dataset.originalText || '💾 Zapisz analizy do gry';
         button.textContent = text;
         button.classList.remove('tcm-btn-green', 'tcm-btn-blue', 'tcm-btn-red');
         if (className) button.classList.add(className);
@@ -202,11 +202,11 @@
     }
 
     function initTWDatabasePanel() {
-        if (document.querySelector('#tcm-twdb-panel') || !document.querySelector('table.ap-table')) return;
+        if (document.querySelector('#tcm-twdb-panel')) return;
 
         const panel = document.createElement('div');
         panel.id = 'tcm-twdb-panel';
-        panel.className = 'tcm-floating-panel';
+        panel.className = 'tcm-floating-panel-top';
 
         const button = document.createElement('button');
         button.type = 'button';
@@ -215,18 +215,18 @@
         button.dataset.originalText = '💾 Zapisz analizy do gry';
 
         panel.appendChild(button);
-        document.body.appendChild(panel);
+        (document.body || document.documentElement).appendChild(panel);
 
         button.addEventListener('click', () => {
             const data = collectTWDatabaseAnalyses();
 
             if (!data.length) {
-                showButtonStatus(button, 'Brak analiz', 'tcm-btn-red');
+                showButtonStatus(button, '❌ Brak analiz', 'tcm-btn-red');
                 return;
             }
 
             saveAnalysisData(data);
-            showButtonStatus(button, `Zapisano: ${data.length}`, 'tcm-btn-blue');
+            showButtonStatus(button, `💾 Zapisano: ${data.length}`, 'tcm-btn-blue');
 
             const returnUrl = GM_getValue('tcm_return_url');
             if (returnUrl) {
@@ -274,11 +274,10 @@
     }
 
     function getIncomingCoordinates(row) {
-        // Zabezpieczenie przed "fałszywymi" koordynatami w etykietach ataków
         const clone = row.cloneNode(true);
         const quickedit = clone.querySelector('.quickedit');
         if (quickedit) {
-            quickedit.remove(); // Usuwamy kontener z nazwą z kopii wiersza, by nie sczytać np. "11|7" z etykiety
+            quickedit.remove();
         }
 
         const coords = Array.from((clone.textContent || '').matchAll(/\b(\d{1,3}\|\d{1,3})\b/g)).map(m => m[1]);
