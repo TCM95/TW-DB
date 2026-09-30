@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.5
+// @version      4.7
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -22,9 +22,22 @@
 
     /*
      * ============================
-     * WSPÓLNE FUNKCJE
+     * WSPÓLNE FUNKCJE & OPTYMALIZACJA
      * ============================
      */
+
+    const throttle = (func, limit) => {
+        let waiting = false;
+        return function (...args) {
+            if (!waiting) {
+                waiting = true;
+                setTimeout(() => {
+                    func.apply(this, args);
+                    waiting = false;
+                }, limit);
+            }
+        };
+    };
 
     const css = `
         :root {
@@ -141,18 +154,16 @@
 
     /*
      * ============================
-     * TW DATABASE
+     * TW DATABASE (PASyWNE OCZEKIWANIE)
      * ============================
      */
 
     function collectTWDatabaseAnalyses() {
         const result = [];
-        // Złagodzony selektor, aby ignorować zmianę ewentualnych klas na tabeli w TWDB
         const rows = document.querySelectorAll('table tbody tr');
 
         rows.forEach((row) => {
             const cells = row.querySelectorAll(':scope > td');
-            // Zabezpieczenie na wypadek mniejszej liczby kolumn w innych tabelach
             if (cells.length < 9) return; 
 
             const target = getCoordinates(cells[1]);
@@ -185,7 +196,6 @@
     }
 
     function initTWDatabasePanel() {
-        // Zamiast szukać tabeli, sprawdzamy czy to w ogóle podstrona analizatora
         if (document.querySelector('#tcm-twdb-panel') || !location.href.includes('command-analyzer')) return;
 
         const panel = document.createElement('div');
@@ -223,11 +233,8 @@
 
     function initTWDatabase() {
         if (!isTWDatabase || !document.body) return;
-
+        // Pojedyncze wywołanie, żadnych procesów w tle
         initTWDatabasePanel();
-
-        const observer = new MutationObserver(() => initTWDatabasePanel());
-        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     /*
@@ -335,8 +342,12 @@
     }
 
     function colorIncomingRows(analysisArray) {
+        if (!analysisArray || !analysisArray.length) return;
         const rows = getIncomingRows();
+
         rows.forEach((row) => {
+            if (row.dataset.tcmColored) return; 
+
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
@@ -345,6 +356,7 @@
             const firstCell = row.querySelector(':scope > td');
             if (firstCell) {
                 firstCell.style.background = getBackgroundStyle(match.c);
+                row.dataset.tcmColored = '1'; 
             }
         });
     }
@@ -429,7 +441,7 @@
         navButton.addEventListener('click', (e) => {
             e.preventDefault();
             GM_setValue('tcm_return_url', window.location.href);
-            window.location.href = 'https://twdatabase.online/command-analyzer/players/849206514';
+            window.location.href = 'https://twdatabase.online/command-analyzer';
         });
 
         const button = document.createElement('button');
@@ -457,10 +469,10 @@
 
         initPlemionaPanel();
 
-        const observer = new MutationObserver(() => {
+        const observer = new MutationObserver(throttle(() => {
             initPlemionaPanel();
             colorIncomingRows(loadAnalysisData());
-        });
+        }, 300));
 
         observer.observe(document.body, { childList: true, subtree: true });
     }
