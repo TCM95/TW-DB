@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      4.7
+// @version      4.8
 // @description  Łączy analizy TW Database z widokiem ataków, pozwala na szybką nawigację i aktualizację zmian
 // @author       TCM
 // @match        *://*.twdatabase.online/*
@@ -154,7 +154,7 @@
 
     /*
      * ============================
-     * TW DATABASE (PASyWNE OCZEKIWANIE)
+     * TW DATABASE (PASYWNE OCZEKIWANIE)
      * ============================
      */
 
@@ -233,7 +233,6 @@
 
     function initTWDatabase() {
         if (!isTWDatabase || !document.body) return;
-        // Pojedyncze wywołanie, żadnych procesów w tle
         initTWDatabasePanel();
     }
 
@@ -313,7 +312,8 @@
         } else {
             input.value = value;
         }
-        ['input', 'change', 'keyup'].forEach(eventType => {
+        // Pozostawiono tylko niezbędne eventy. Usunięto 'keyup', by nie aktywować dodatkowych akcji z gry.
+        ['input', 'change'].forEach(eventType => {
             input.dispatchEvent(new Event(eventType, { bubbles: true }));
         });
     }
@@ -322,11 +322,21 @@
         const renameButton = findRenameButton(row);
         if (!renameButton) return false;
 
+        // Tymczasowe zablokowanie focus(), aby powstrzymać klawiaturę mobilną
+        const originalFocus = HTMLElement.prototype.focus;
+        HTMLElement.prototype.focus = function() {}; 
+
         renameButton.click();
 
         window.setTimeout(() => {
             const input = findRenameInput(row);
-            if (!input) return;
+            if (!input) {
+                HTMLElement.prototype.focus = originalFocus;
+                return;
+            }
+
+            // Atrybut inputmode wymusza brak klawiatury sprzętowej / wirtualnej
+            input.setAttribute('inputmode', 'none');
 
             setNativeInputValue(input, newLabel);
             const saveButton = findRenameSaveButton(row);
@@ -334,11 +344,15 @@
             if (saveButton && saveButton !== renameButton) {
                 saveButton.click();
             } else {
-                ['keydown', 'keyup'].forEach(eventType => {
-                    input.dispatchEvent(new KeyboardEvent(eventType, { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                });
+                input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
             }
-        }, 250);
+
+            // Przywracamy domyślne zachowanie na ułamek sekundy po wykonaniu zadania
+            setTimeout(() => {
+                HTMLElement.prototype.focus = originalFocus;
+            }, 50);
+
+        }, 30); // Zmniejszono z 250ms na 30ms (input ładuje się błyskawicznie)
     }
 
     function colorIncomingRows(analysisArray) {
@@ -392,18 +406,20 @@
                 renameIncomingCommand(row, newLabel);
             }, delay);
 
-            delay += 1300;
+            // 1050ms – minimalny bezpieczny limit (zgodnie z ograniczeniami regulaminu 1 żądanie/sek).
+            // Dzięki poprawkom wyżej, UI nie będzie już przycinać w trakcie tego oczekiwania.
+            delay += 1050; 
             changesCount += 1;
         });
 
         if (changesCount > 0) {
-            const message = `Rozpoczęto zmianę nazw. Liczba komend: ${changesCount}. Przewidywany czas: ${(changesCount * 1.3).toFixed(1)} s.`;
+            const message = `Rozpoczęto bezinwazyjną zmianę nazw. Liczba komend: ${changesCount}. Przewidywany czas: ${(changesCount * 1.05).toFixed(1)} s.`;
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 5000, 'success');
         } else if (alreadyLabeledCount > 0) {
-            const message = `Wszystkie pasujące komendy (${alreadyLabeledCount}) są już aktualne (brak zmian na TWDB).`;
+            const message = `Wszystkie pasujące komendy (${alreadyLabeledCount}) są już aktualne.`;
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 4000, 'success');
         } else {
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono komend pasujących do zapisanych analiz.', 4000, 'error');
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono komend pasujących do analiz.', 4000, 'error');
         }
     }
 
