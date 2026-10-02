@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Analizator TWDB
 // @namespace    https://viayoo.com/
-// @version      5.3
-// @description  Ominięcie kolejki TW: bezpośredni zapis z interwałem 80-190ms między rozkazami
+// @version      6.5
+// @description  Szybkie wysyłanie (200ms) + dokładny licznik dopasowań i aktualizacji
 // @author       TCM
 // @match        *://*.twdatabase.online/*
 // @match        https://*.plemiona.pl/game.php*
@@ -16,9 +16,13 @@
     'use strict';
 
     const STORAGE_KEY = 'twdb_data';
+    const COLOR_TOGGLE_KEY = 'twdb_color_enabled';
 
     const isTWDatabase = /(^|\.)twdatabase\.online$/i.test(location.hostname);
     const isPlemiona = /(^|\.)plemiona\.pl$/i.test(location.hostname);
+
+    let isUpdating = false;
+    let colorEnabled = GM_getValue(COLOR_TOGGLE_KEY, true);
 
     const throttle = (func, limit) => {
         let waiting = false;
@@ -35,38 +39,45 @@
 
     const css = `
         :root {
-            --tcm-bg-main: #36393f;
-            --tcm-bg-header: #202225;
-            --tcm-border: #3e4147;
-            --tcm-text: #ffffff;
-            --tcm-btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, #000000 100%);
-            --tcm-btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
-            --tcm-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
-            --tcm-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
-            --tcm-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
-            --tcm-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
+            --bg-main: #36393f;
+            --bg-row-alt: #32353b;
+            --bg-header: #202225;
+            --border-color: #3e4147;
+            --text-color: white;
+            --title-color: #ffffdf;
+            --btn-bg: linear-gradient(#6e7178 0%, #36393f 30%, #202225 80%, black 100%);
+            --btn-hover: linear-gradient(#7b7e85 0%, #40444a 30%, #393c40 80%, #171717 100%);
+            --btn-green-bg: linear-gradient(#5cad5c 0%, #2e7a2e 30%, #1f5c1f 80%, #0f2e0f 100%);
+            --btn-green-hover: linear-gradient(#6bbf6b 0%, #388c38 30%, #267326 80%, #143d14 100%);
+            --btn-red-bg: linear-gradient(#ad5c5c 0%, #7a2e2e 30%, #5c1f1f 80%, #2e0f0f 100%);
+            --btn-red-hover: linear-gradient(#bf6b6b 0%, #8c3838 30%, #732626 80%, #3d1414 100%);
+            --btn-blue-bg: linear-gradient(#5c8cad 0%, #2e5c7a 30%, #1f425c 80%, #0f222e 100%);
+            --btn-blue-hover: linear-gradient(#6ba3bf 0%, #38738c 30%, #265473 80%, #142e3d 100%);
         }
 
         .tcm-btn {
             appearance: none;
-            border: 1px solid var(--tcm-border);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            background: var(--tcm-btn-bg);
-            color: var(--tcm-text);
+            background: var(--btn-bg);
+            color: var(--text-color);
             padding: 10px 15px;
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
             line-height: 1.2;
             text-align: center;
-            transition: filter 120ms ease;
+            transition: background 120ms ease;
+            white-space: nowrap;
         }
 
-        .tcm-btn:hover { filter: brightness(1.15); }
-        .tcm-btn-green { background: var(--tcm-green-bg); }
-        .tcm-btn-green:hover { background: var(--tcm-green-hover); }
-        .tcm-btn-blue { background: var(--tcm-blue-bg); }
-        .tcm-btn-red { background: var(--tcm-red-bg); }
+        .tcm-btn:hover { background: var(--btn-hover); }
+        .tcm-btn-green { background: var(--btn-green-bg); }
+        .tcm-btn-green:hover { background: var(--btn-green-hover); }
+        .tcm-btn-blue { background: var(--btn-blue-bg); }
+        .tcm-btn-blue:hover { background: var(--btn-blue-hover); }
+        .tcm-btn-red { background: var(--btn-red-bg); }
+        .tcm-btn-red:hover { background: var(--btn-red-hover); }
 
         .tcm-floating-panel {
             position: fixed !important;
@@ -78,10 +89,18 @@
             flex-direction: column;
             gap: 8px;
             padding: 10px;
-            background: var(--tcm-bg-main);
-            border: 1px solid var(--tcm-border);
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+        }
+
+        .tcm-header-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 10px;
+            vertical-align: middle;
         }
     `;
 
@@ -98,6 +117,7 @@
     }
 
     function getCoordinates(textOrElement) {
+        if (!textOrElement) return null;
         const text = typeof textOrElement === 'string' ? textOrElement : getText(textOrElement);
         const match = text.match(/\b(\d{1,3}\|\d{1,3})\b/);
         return match ? match[1] : null;
@@ -127,14 +147,12 @@
     function showButtonStatus(button, text, className, timeout = 4000) {
         const originalText = button.dataset.originalText || 'Zapisz analizy';
         button.textContent = text;
-        button.classList.remove('tcm-btn-green', 'tcm-btn-blue', 'tcm-btn-red');
-        if (className) button.classList.add(className);
+        button.className = `tcm-btn ${className}`;
 
         setTimeout(() => {
             if (!button.isConnected) return;
             button.textContent = originalText;
-            button.classList.remove('tcm-btn-green', 'tcm-btn-blue', 'tcm-btn-red');
-            button.classList.add('tcm-btn-green');
+            button.className = 'tcm-btn tcm-btn-green';
         }, timeout);
     }
 
@@ -207,13 +225,14 @@
     }
 
     function getIncomingRows() {
-        return Array.from(document.querySelectorAll('#incomings_table tr.nowrap, #incomings_table tbody tr, table#incomings_table tr'));
+        return Array.from(document.querySelectorAll('#incomings_table tr')).filter(row => row.querySelector('.quickedit[data-id]'));
     }
 
     function getIncomingCoordinates(row) {
         const cells = Array.from(row.querySelectorAll(':scope > td'));
-        let target = getCoordinates(cells[1]);
-        let origin = getCoordinates(cells[2]);
+        
+        let target = cells[1] ? getCoordinates(cells[1]) : null;
+        let origin = cells[2] ? getCoordinates(cells[2]) : null;
 
         if (!target || !origin) {
             const coordinates = Array.from(row.textContent.matchAll(/\b\d{1,3}\|\d{1,3}\b/g)).map(match => match[0]);
@@ -223,48 +242,72 @@
         return { target, origin };
     }
 
-    function colorIncomingRows(analysisArray) {
-        if (!analysisArray || !analysisArray.length) return;
+    function applyOrClearColors() {
+        const analysisArray = loadAnalysisData();
         getIncomingRows().forEach((row) => {
+            const firstCell = row.querySelector(':scope > td');
+            if (!firstCell) return;
+
+            if (!colorEnabled) {
+                firstCell.style.background = '';
+                delete row.dataset.tcmColored;
+                return;
+            }
+
             if (row.dataset.tcmColored) return; 
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
             if (match && Array.isArray(match.c)) {
-                const firstCell = row.querySelector(':scope > td');
-                if (firstCell) {
-                    firstCell.style.background = getBackgroundStyle(match.c);
-                    row.dataset.tcmColored = '1'; 
-                }
+                firstCell.style.background = getBackgroundStyle(match.c);
+                row.dataset.tcmColored = '1'; 
             }
         });
     }
 
-    function getRandomDelay(min = 80, max = 190) {
+    function getRandomDelay(min = 250, max = 260) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // Rekurencyjna funkcja wysyłająca surowe żądania omijając skrypty gry
-    function processNext(items, index) {
-        if (index >= items.length) {
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(`Zakończono zapis ${items.length} nazw!`, 3000, 'success');
+    function updateTextNodeOnly(element, newText) {
+        if (!element) return;
+        const textNodes = Array.from(element.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
+        const targetNode = textNodes.find(n => n.textContent.trim().length > 0);
+        
+        if (targetNode) {
+            targetNode.nodeValue = ' ' + newText + ' ';
+        } else {
+            element.prepend(document.createTextNode(' ' + newText + ' '));
+        }
+    }
+
+    function processNextHeadless(items, index, btnEl, stats) {
+        const totalToProcess = items.length;
+
+        if (index >= totalToProcess) {
+            isUpdating = false; 
+            applyOrClearColors();
+            
+            if (btnEl) btnEl.innerHTML = `✅ ${stats.totalMatched}/${stats.totalMatched}`;
+            
+            const message = `Zakończono! Zaktualizowano ${totalToProcess} komend` + 
+                            (stats.alreadyLabeled > 0 ? ` (Pominięto ${stats.alreadyLabeled} już aktualnych)` : '') + `. Łącznie: ${stats.totalMatched}.`;
+            
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(message, 4000, 'success');
+            
+            setTimeout(() => { if (btnEl && !isUpdating) btnEl.innerHTML = '⚙️ Wczytaj'; }, 4000);
             return;
         }
+
+        const currentProcessed = stats.alreadyLabeled + index + 1;
+        if (btnEl) btnEl.innerHTML = `⌛ ${currentProcessed} z ${stats.totalMatched}`;
 
         const item = items[index];
         const csrf = typeof window.game_data !== 'undefined' ? window.game_data.csrf : '';
         const villageId = typeof window.game_data !== 'undefined' ? window.game_data.village.id : '';
 
-        const quickedit = item.row.querySelector('.quickedit');
-        let commandId = quickedit ? quickedit.getAttribute('data-id') : null;
-
-        if (!commandId) {
-            const checkbox = item.row.querySelector('input[name="command_ids[]"]');
-            if (checkbox) commandId = checkbox.value;
-        }
-
-        if (commandId && csrf) {
-            const url = `/game.php?village=${villageId}&screen=info_command&ajaxaction=edit_other_comment&id=${commandId}&h=${csrf}`;
+        if (item.commandId && csrf) {
+            const url = `/game.php?village=${villageId}&screen=info_command&ajaxaction=edit_other_comment&id=${item.commandId}&h=${csrf}`;
             const formData = new URLSearchParams();
             formData.append('text', item.newLabel);
 
@@ -276,26 +319,14 @@
                 },
                 body: formData.toString()
             }).then(() => {
-                if (quickedit) {
-                    const label = quickedit.querySelector('.quickedit-label');
-                    const editBox = quickedit.querySelector('.quickedit-edit');
-                    
-                    if (label) {
-                        label.innerHTML = item.newLabel;
-                        label.style.display = '';
-                    }
-                    if (editBox) {
-                        editBox.style.display = 'none';
-                    }
-                }
-            }).catch(err => console.error('[TWDB] Błąd fetch:', err));
+                if (item.labelElement) updateTextNodeOnly(item.labelElement, item.newLabel);
+            }).catch(err => console.error('[TWDB] Błąd sieci:', err));
         }
 
-        // Ustawienie losowego interwału do wykonania kolejnego strzału
-        setTimeout(() => processNext(items, index + 1), getRandomDelay(80, 190));
+        setTimeout(() => processNextHeadless(items, index + 1, btnEl, stats), getRandomDelay(200, 280));
     }
 
-    function loadAnalysesToGame() {
+    function loadAnalysesToGame(btnEl) {
         const analysisArray = loadAnalysisData();
         if (!analysisArray.length) {
             if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Brak zapisanych danych z TWDB!', 3000, 'error');
@@ -305,19 +336,25 @@
         const rows = getIncomingRows();
         const itemsToProcess = [];
         let alreadyLabeledCount = 0;
+        let totalMatched = 0;
 
-        const originalFocus = HTMLElement.prototype.focus;
-        HTMLElement.prototype.focus = function() {};
-
-        // 1. Zbieranie zadań
         rows.forEach((row) => {
             const { target, origin } = getIncomingCoordinates(row);
             const match = findAnalysis(analysisArray, target, origin);
 
             if (!match || !match.a) return;
 
-            const labelElement = row.querySelector('.quickedit-label, .command-label, [class*="label"]');
-            const currentLabel = labelElement ? getText(labelElement) : '';
+            const quickedit = row.querySelector('.quickedit');
+            if (!quickedit) return;
+
+            const commandId = quickedit.getAttribute('data-id');
+            const labelContainer = quickedit.querySelector('.quickedit-label');
+            
+            if (!commandId || !labelContainer) return;
+            
+            totalMatched++;
+
+            const currentLabel = getText(labelContainer);
             const cleanLabel = currentLabel.replace(/\[[^\]]*]/g, '').replace(/\s+/g, ' ').trim();
             const newLabel = cleanLabel ? `${cleanLabel} ${match.a}` : match.a;
 
@@ -326,34 +363,33 @@
                 return;
             }
 
-            const renameBtn = row.querySelector('.rename-icon, .quickedit-label ~ a, [class*="rename"]');
-            if (renameBtn) itemsToProcess.push({ row, newLabel, renameBtn });
+            itemsToProcess.push({ 
+                commandId: commandId, 
+                newLabel: newLabel, 
+                labelElement: labelContainer
+            });
         });
 
-        if (!itemsToProcess.length) {
-            HTMLElement.prototype.focus = originalFocus;
-            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(alreadyLabeledCount > 0 ? `Wszystkie (${alreadyLabeledCount}) aktualne.` : 'Nie znaleziono pasujących komend.', 4000, alreadyLabeledCount > 0 ? 'success' : 'error');
+        if (!totalMatched) {
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage('Nie znaleziono pasujących komend z bazy w tym widoku.', 4000, 'error');
             return;
         }
 
-        // 2. Jednoczesne otworzenie wszystkich kontenerów edycji
-        itemsToProcess.forEach(item => item.renameBtn.click());
+        if (!itemsToProcess.length) {
+            if (typeof UI !== 'undefined' && UI.InfoMessage) UI.InfoMessage(`Wszystkie znalezione komendy (${totalMatched}) są już aktualne!`, 4000, 'success');
+            if (btnEl) btnEl.innerHTML = `✅ ${totalMatched}/${totalMatched}`;
+            setTimeout(() => { if (btnEl) btnEl.innerHTML = '⚙️ Wczytaj'; }, 3000);
+            return;
+        }
 
-        // 3. Wstrzyknięcie widoku (iluzja działania natywnego) i start wysyłania asynchronicznego omijając grę
-        setTimeout(() => {
-            itemsToProcess.forEach(item => {
-                const input = item.row.querySelector('input[type="text"], input.quickedit-edit');
-                if (input) {
-                    input.setAttribute('inputmode', 'none');
-                    input.value = item.newLabel;
-                }
-            });
-            HTMLElement.prototype.focus = originalFocus;
-            
-            // Inicjalizacja bezpośredniego wysyłania (fetch co 80-190ms na obiekt)
-            processNext(itemsToProcess, 0);
-
-        }, 50);
+        isUpdating = true; 
+        const stats = { totalMatched: totalMatched, alreadyLabeled: alreadyLabeledCount };
+        
+        if (typeof UI !== 'undefined' && UI.InfoMessage) {
+            UI.InfoMessage(`Dopasowano ${totalMatched} komend. Rozpoczynam zapis ${itemsToProcess.length} nowych...`, 3000, 'success');
+        }
+        
+        processNextHeadless(itemsToProcess, 0, btnEl, stats);
     }
 
     function isIncomingPage() {
@@ -366,42 +402,65 @@
         const tableHeader = document.querySelector('#incomings_table tr th');
         if (!tableHeader) return;
 
+        const container = document.createElement('span');
+        container.id = 'tcm-twdb-nav-header';
+        container.className = 'tcm-header-container';
+
         const navBtn = document.createElement('button');
-        navBtn.id = 'tcm-twdb-nav-header';
         navBtn.className = 'tcm-btn tcm-btn-green';
         navBtn.innerHTML = '➡ TWDB';
-        navBtn.style.cssText = 'padding:2px 8px; margin-left:10px; font-size:11px; vertical-align:middle;';
+        navBtn.style.cssText = 'padding:2px 8px; font-size:11px;';
         
         navBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            if (isUpdating) return;
             GM_setValue('tcm_return_url', window.location.href);
             window.location.href = 'https://twdatabase.online/command-analyzer';
         });
 
         const loadBtn = document.createElement('button');
-        loadBtn.id = 'tcm-twdb-btn-header';
         loadBtn.className = 'tcm-btn tcm-btn-blue';
         loadBtn.innerHTML = '⚙️ Wczytaj';
-        loadBtn.style.cssText = 'padding:2px 8px; margin-left:5px; font-size:11px; vertical-align:middle;';
+        loadBtn.style.cssText = 'padding:2px 8px; font-size:11px; min-width: 90px;';
         
         loadBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            loadAnalysesToGame();
+            if (isUpdating) return;
+            loadAnalysesToGame(loadBtn);
         });
 
-        tableHeader.appendChild(navBtn);
-        tableHeader.appendChild(loadBtn);
+        const colorToggleBtn = document.createElement('button');
+        colorToggleBtn.className = colorEnabled ? 'tcm-btn tcm-btn-green' : 'tcm-btn tcm-btn-red';
+        colorToggleBtn.innerHTML = colorEnabled ? '🎨 Kolory: WŁ' : '🎨 Kolory: WYŁ';
+        colorToggleBtn.style.cssText = 'padding:2px 8px; font-size:11px; min-width: 90px;';
 
-        colorIncomingRows(loadAnalysisData());
+        colorToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            colorEnabled = !colorEnabled;
+            GM_setValue(COLOR_TOGGLE_KEY, colorEnabled);
+            colorToggleBtn.className = colorEnabled ? 'tcm-btn tcm-btn-green' : 'tcm-btn tcm-btn-red';
+            colorToggleBtn.innerHTML = colorEnabled ? '🎨 Kolory: WŁ' : '🎨 Kolory: WYŁ';
+            applyOrClearColors();
+        });
+
+        container.appendChild(navBtn);
+        container.appendChild(loadBtn);
+        container.appendChild(colorToggleBtn);
+        
+        tableHeader.appendChild(container);
+        applyOrClearColors();
     }
 
     function initPlemiona() {
         if (!isPlemiona || !document.body) return;
         initPlemionaPanel();
+        
         const observer = new MutationObserver(throttle(() => {
+            if (isUpdating) return; 
             initPlemionaPanel();
-            colorIncomingRows(loadAnalysisData());
+            applyOrClearColors();
         }, 300));
+        
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
